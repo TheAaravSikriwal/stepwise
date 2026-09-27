@@ -26,9 +26,11 @@ trap messages, and worker protocol.
      types in `compiler/src/checked.rs` are a shared draft.
   4. **Codegen:** `docs/specs/codegen.md`, then `cargo test --test codegen` (7 exact traces, the
      steps table, and 22 golden programs in `compiler/tests/programs/`).
-  5. After each stage passes, bump `PIPELINE` in `compiler/src/lib.rs` (Lexer → Parser → Checker →
+  5. After each stage passes, bump `PIPELINE` in `compiler/src/lib.rs` (Lexer â†’ Parser â†’ Checker â†’
      Codegen), run `npm run wasm` in `web/`, and try broken programs in the playground.
-  6. When a piece passes, move its step in `.github/workflows/ci.yml` up into the required tests.
+  6. **Replay engine** (independent of the compiler, so do it whenever): `docs/specs/replay.md`,
+     then `cd web && npx vitest run tests/replay` (18 correctness + 4 speed tests).
+  7. When a piece passes, move its step in `.github/workflows/ci.yml` up into the required tests.
 - **My track:** Step 5 prep: the debugger UI (variables, call stack, output synced to steps, step controls) built against a fake replay engine, plus the replay engine spec and property tests.
 
 Every test file has been checked against a throwaway reference implementation (outside the
