@@ -10,6 +10,8 @@ public launch.
 - Programs compile and run in a Web Worker, with a million-event limit and friendly runtime errors
 - Debugger UI: call stack, variables with change highlights, output synced to the current step,
   step buttons, timeline, keyboard shortcuts (`?demo` previews it)
+- Step over, step out and breakpoints, in both directions (click a line number or press F9;
+  Shift+arrows step over, Page Up/Down jump between breakpoints)
 - Example gallery with 10 commented programs, including "find the bug" exercises
 - Shareable links: the program is stored in the URL
 - Language reference and "How it works" pages

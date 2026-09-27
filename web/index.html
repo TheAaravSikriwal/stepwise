@@ -17,9 +17,13 @@
       <span id="share-status" class="notice" aria-live="polite"></span>
       <div class="controls" role="toolbar" aria-label="Step controls">
         <button id="to-start" type="button" class="secondary" title="Go to the start (Home)" aria-label="Go to the start">⏮</button>
+        <button id="prev-break" type="button" class="secondary" title="Back to the previous breakpoint (Page Up). Click a line number to set one." aria-label="Previous breakpoint">◀◀</button>
         <button id="step-back" type="button" class="secondary" title="Step back (←, or Alt+← in the editor)">◀ Back</button>
         <button id="step-forward" type="button" class="secondary" title="Step forward (→, or Alt+→ in the editor)">Forward ▶</button>
+        <button id="next-break" type="button" class="secondary" title="Continue to the next breakpoint (Page Down). Click a line number to set one." aria-label="Next breakpoint">▶▶</button>
         <button id="to-end" type="button" class="secondary" title="Go to the end (End)" aria-label="Go to the end">⏭</button>
+        <button id="step-over" type="button" class="secondary" title="Step over: skip past function calls (Shift+→; Shift+click or Shift+← to go back)">Over</button>
+        <button id="step-out" type="button" class="secondary" title="Step out: finish this function (Shift+click to go back to where it was called)">Out</button>
         <input id="timeline" type="range" min="0" max="0" value="0" aria-label="Timeline" />
         <span id="step-label" aria-live="polite"></span>
       </div>

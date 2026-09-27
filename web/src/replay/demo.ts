@@ -4,6 +4,7 @@
 // tests/fixtures/traces.ts.
 
 import type { DebugTable, Range } from "../compiler";
+import { StepIndex } from "../ui/steps";
 import type { Replay, ReplayState } from "./types";
 
 export const DEMO_SOURCE = `fn main() {
@@ -67,4 +68,11 @@ export function createDemoReplay(): Replay {
     seek: (k) => void (step = Math.max(0, Math.min(rows.length - 1, Math.trunc(k)))),
     state: () => stateAt(step),
   };
+}
+
+/** Step navigation for the demo: everything happens in `main`. */
+export function createDemoStepIndex(lineOf: (offset: number) => number): StepIndex {
+  const depth = Int32Array.from(rows, ([line]) => (line === null ? 0 : 1));
+  const lines = Int32Array.from(rows, ([line]) => (line === null ? 0 : lineOf(DEMO_DEBUG.steps[line].from)));
+  return new StepIndex(depth, lines);
 }

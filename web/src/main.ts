@@ -2,12 +2,13 @@
 
 import { createEditor } from "./editor/editor";
 import { EXAMPLES } from "./examples";
-import { DEMO_DEBUG, DEMO_SOURCE, createDemoReplay } from "./replay/demo";
+import { DEMO_DEBUG, DEMO_SOURCE, createDemoReplay, createDemoStepIndex } from "./replay/demo";
 import { createReplay } from "./replay/replay";
 import { describeOutcome } from "./runtime/run";
 import { outputOf } from "./runtime/trace";
 import { decodeProgram, encodeProgram } from "./share";
 import { Debugger } from "./ui/debugger";
+import { StepIndex } from "./ui/steps";
 import { Runner } from "./worker/client";
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
@@ -41,6 +42,10 @@ const debug = new Debugger(
     back: $<HTMLButtonElement>("#step-back"),
     forward: $<HTMLButtonElement>("#step-forward"),
     toEnd: $<HTMLButtonElement>("#to-end"),
+    prevBreak: $<HTMLButtonElement>("#prev-break"),
+    nextBreak: $<HTMLButtonElement>("#next-break"),
+    over: $<HTMLButtonElement>("#step-over"),
+    out: $<HTMLButtonElement>("#step-out"),
   },
   editor,
 );
@@ -61,7 +66,8 @@ async function runProgram(): Promise<void> {
   runButton.disabled = true;
   try {
     if (demo) {
-      debug.load({ replay: createDemoReplay(), debug: DEMO_DEBUG, endMessage: null });
+      const index = createDemoStepIndex(editor.lineOf);
+      debug.load({ replay: createDemoReplay(), debug: DEMO_DEBUG, index, endMessage: null });
       return;
     }
     const res = await runner.run(editor.source());
@@ -77,7 +83,8 @@ async function runProgram(): Promise<void> {
         const endMessage = describeOutcome(res.outcome);
         try {
           const replay = createReplay(res.trace, res.meta.debug);
-          debug.load({ replay, debug: res.meta.debug, endMessage });
+          const index = StepIndex.fromTrace(res.trace, res.meta.debug, editor.lineOf);
+          debug.load({ replay, debug: res.meta.debug, index, endMessage });
         } catch (e) {
           // No replay engine yet (or it crashed): still show the output.
           debug.showOutputOnly(outputOf(res.trace), endMessage, `Stepping isn't available: ${(e as Error).message}`);

@@ -4,12 +4,14 @@
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { bracketMatching, indentOnInput, indentUnit } from "@codemirror/language";
 import { type Diagnostic as LintDiagnostic, lintGutter, setDiagnostics } from "@codemirror/lint";
-import { EditorState, StateEffect, StateField } from "@codemirror/state";
+import { EditorState, RangeSet, StateEffect, StateField } from "@codemirror/state";
 import {
   Decoration,
   type DecorationSet,
   EditorView,
+  GutterMarker,
   drawSelection,
+  gutter,
   highlightActiveLine,
   highlightActiveLineGutter,
   keymap,
@@ -31,6 +33,8 @@ export interface Editor {
   lineOf(offset: number): number;
   /** Called after every edit. */
   onChange(listener: () => void): void;
+  /** 1-based line numbers that have a breakpoint. */
+  breakpoints(): Set<number>;
 }
 
 const setStep = StateEffect.define<Range | null>();
@@ -58,6 +62,52 @@ const stepHighlight = StateField.define<DecorationSet>({
   provide: (field) => EditorView.decorations.from(field),
 });
 
+// Breakpoints: click the gutter next to a line number (or press F9) to toggle.
+const toggleBreakpointAt = StateEffect.define<number>({ map: (pos, mapping) => mapping.mapPos(pos) });
+
+const breakpointMarker = new (class extends GutterMarker {
+  toDOM() {
+    const dot = document.createElement("span");
+    dot.className = "cm-breakpoint";
+    dot.textContent = "●";
+    dot.title = "Breakpoint";
+    return dot;
+  }
+})();
+
+const breakpointState = StateField.define<RangeSet<GutterMarker>>({
+  create: () => RangeSet.empty,
+  update(set, tr) {
+    set = set.map(tr.changes);
+    for (const effect of tr.effects) {
+      if (!effect.is(toggleBreakpointAt)) continue;
+      const pos = effect.value;
+      let has = false;
+      set.between(pos, pos, () => void (has = true));
+      set = has
+        ? set.update({ filter: (from) => from !== pos })
+        : set.update({ add: [breakpointMarker.range(pos)] });
+    }
+    return set;
+  },
+});
+
+function toggleBreakpoint(view: EditorView, pos: number): boolean {
+  view.dispatch({ effects: toggleBreakpointAt.of(view.state.doc.lineAt(pos).from) });
+  return true;
+}
+
+const breakpoints = [
+  breakpointState,
+  gutter({
+    class: "cm-breakpoint-gutter",
+    markers: (v) => v.state.field(breakpointState),
+    initialSpacer: () => breakpointMarker,
+    domEventHandlers: { mousedown: (view, line) => toggleBreakpoint(view, line.from) },
+  }),
+  keymap.of([{ key: "F9", run: (view) => toggleBreakpoint(view, view.state.selection.main.head) }]),
+];
+
 export function createEditor(parent: HTMLElement, doc: string, onRun: () => void): Editor {
   const listeners: (() => void)[] = [];
   const runKey = { key: "Mod-Enter", run: () => (onRun(), true), preventDefault: true };
@@ -75,6 +125,7 @@ export function createEditor(parent: HTMLElement, doc: string, onRun: () => void
         bracketMatching(),
         indentUnit.of("    "),
         EditorState.tabSize.of(4),
+        breakpoints,
         lintGutter(),
         stepHighlight,
         keymap.of([runKey, ...defaultKeymap, ...historyKeymap, indentWithTab]),
@@ -106,6 +157,13 @@ export function createEditor(parent: HTMLElement, doc: string, onRun: () => void
     },
     lineOf: (offset) => view.state.doc.lineAt(Math.min(offset, view.state.doc.length)).number,
     onChange: (listener) => void listeners.push(listener),
+    breakpoints() {
+      const lines = new Set<number>();
+      view.state.field(breakpointState).between(0, view.state.doc.length, (from) => {
+        lines.add(view.state.doc.lineAt(from).number);
+      });
+      return lines;
+    },
   };
 }
 

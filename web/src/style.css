@@ -87,6 +87,7 @@ button:disabled {
 
 select {
   font: inherit;
+  max-width: 100%;
   padding: 0.3rem 0.5rem;
   border-radius: 6px;
   border: 1px solid var(--border);
@@ -390,4 +391,19 @@ article td {
 
 article a {
   color: var(--accent);
+}
+
+#editor .cm-breakpoint-gutter .cm-gutterElement {
+  width: 1.1rem;
+  padding-left: 0.2rem;
+  cursor: pointer;
+  color: transparent;
+}
+
+#editor .cm-breakpoint-gutter .cm-gutterElement:hover {
+  color: var(--muted);
+}
+
+#editor .cm-breakpoint {
+  color: var(--error);
 }

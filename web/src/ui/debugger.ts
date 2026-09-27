@@ -5,10 +5,13 @@
 import type { DebugTable } from "../compiler";
 import type { Editor } from "../editor/editor";
 import { type Replay, type ReplayState, varKey } from "../replay/types";
+import type { StepIndex } from "./steps";
 
 export interface Session {
   replay: Replay;
   debug: DebugTable;
+  /** For step over / out and breakpoints. */
+  index: StepIndex;
   /** Shown at the final step, e.g. a runtime error or the step-limit message. */
   endMessage: string | null;
 }
@@ -23,6 +26,10 @@ interface Elements {
   back: HTMLButtonElement;
   forward: HTMLButtonElement;
   toEnd: HTMLButtonElement;
+  prevBreak: HTMLButtonElement;
+  nextBreak: HTMLButtonElement;
+  over: HTMLButtonElement;
+  out: HTMLButtonElement;
 }
 
 export class Debugger {
@@ -39,6 +46,11 @@ export class Debugger {
     el.back.addEventListener("click", () => this.step(-1));
     el.forward.addEventListener("click", () => this.step(1));
     el.toEnd.addEventListener("click", () => this.seek(Infinity));
+    el.prevBreak.addEventListener("click", () => this.toBreakpoint(-1));
+    el.nextBreak.addEventListener("click", () => this.toBreakpoint(1));
+    // Shift+click goes backward.
+    el.over.addEventListener("click", (e) => this.stepOver(e.shiftKey ? -1 : 1));
+    el.out.addEventListener("click", (e) => this.stepOut(e.shiftKey ? -1 : 1));
     el.timeline.addEventListener("input", () => this.seek(Number(el.timeline.value)));
     document.addEventListener("keydown", (e) => this.onKey(e));
     this.clear("Press Run, then step through your program with ← and →.");
@@ -85,6 +97,26 @@ export class Debugger {
     if (this.current) this.seek(this.current.step + delta);
   }
 
+  /** Steps without entering function calls. */
+  stepOver(dir: 1 | -1): void {
+    this.jump((ix, k) => (dir === 1 ? ix.nextOver(k) : ix.prevOver(k)));
+  }
+
+  /** Finishes the current function (or, backward, returns to where it was called). */
+  stepOut(dir: 1 | -1): void {
+    this.jump((ix, k) => (dir === 1 ? ix.nextOut(k) : ix.prevOut(k)));
+  }
+
+  /** Runs to the next (or previous) step on a line with a breakpoint. */
+  toBreakpoint(dir: 1 | -1): void {
+    const lines = this.editor.breakpoints();
+    this.jump((ix, k) => (dir === 1 ? ix.nextBreak(k, lines) : ix.prevBreak(k, lines)));
+  }
+
+  private jump(target: (index: StepIndex, step: number) => number): void {
+    if (this.session && this.current) this.seek(target(this.session.index, this.current.step));
+  }
+
   seek(step: number): void {
     const s = this.session;
     if (!s) return;
@@ -103,8 +135,8 @@ export class Debugger {
 
     this.el.stepLabel.textContent = atEnd ? `Finished (${last} steps)` : `Step ${st.step + 1} of ${last}`;
     this.el.timeline.value = String(st.step);
-    this.el.toStart.disabled = this.el.back.disabled = st.step === 0;
-    this.el.forward.disabled = this.el.toEnd.disabled = atEnd;
+    this.el.toStart.disabled = this.el.back.disabled = this.el.prevBreak.disabled = st.step === 0;
+    this.el.forward.disabled = this.el.toEnd.disabled = this.el.nextBreak.disabled = atEnd;
 
     this.editor.showStep(st.line === null ? null : (s.debug.steps[st.line] ?? null));
     this.renderStack(st, s.debug);
@@ -182,7 +214,8 @@ export class Debugger {
   }
 
   private setEnabled(on: boolean): void {
-    for (const b of [this.el.toStart, this.el.back, this.el.forward, this.el.toEnd]) b.disabled = !on;
+    const buttons = [this.el.toStart, this.el.back, this.el.forward, this.el.toEnd, this.el.prevBreak, this.el.nextBreak, this.el.over, this.el.out];
+    for (const b of buttons) b.disabled = !on;
     this.el.timeline.disabled = !on;
   }
 
@@ -191,12 +224,16 @@ export class Debugger {
     const inEditor = (e.target as HTMLElement | null)?.closest?.(".cm-editor") != null;
     // In the editor, plain arrows move the cursor; Alt+arrows always step.
     if (inEditor && !e.altKey) return;
-    const actions: Record<string, () => void> = {
-      ArrowLeft: () => this.step(-1),
-      ArrowRight: () => this.step(1),
-      Home: () => this.seek(0),
-      End: () => this.seek(Infinity),
-    };
+    const actions: Record<string, () => void> = e.shiftKey
+      ? { ArrowLeft: () => this.stepOver(-1), ArrowRight: () => this.stepOver(1) }
+      : {
+          ArrowLeft: () => this.step(-1),
+          ArrowRight: () => this.step(1),
+          Home: () => this.seek(0),
+          End: () => this.seek(Infinity),
+          PageUp: () => this.toBreakpoint(-1),
+          PageDown: () => this.toBreakpoint(1),
+        };
     const action = actions[e.key];
     if (!action || (e.target instanceof HTMLInputElement && e.target.type === "range" && !e.altKey)) return;
     e.preventDefault();
