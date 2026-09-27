@@ -1,0 +1,25 @@
+// Prime numbers up to 30. A number is prime if nothing from 2 up to
+// its square root divides it evenly.
+fn is_prime(n: int) -> bool {
+    if n < 2 {
+        return false;
+    }
+    let mut d = 2;
+    while d * d <= n {
+        if n % d == 0 {
+            return false;
+        }
+        d = d + 1;
+    }
+    return true;
+}
+
+fn main() {
+    let mut n = 1;
+    while n <= 30 {
+        if is_prime(n) {
+            print(n);
+        }
+        n = n + 1;
+    }
+}

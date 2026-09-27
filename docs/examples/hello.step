@@ -1,0 +1,6 @@
+// Your first program. Press Run, then step forward with the arrow keys.
+fn main() {
+    let name_length = 5;
+    let doubled = name_length * 2;
+    print(doubled);
+}

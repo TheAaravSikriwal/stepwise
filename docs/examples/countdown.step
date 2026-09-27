@@ -1,0 +1,13 @@
+// A recursive countdown. Each call waits for the next one to finish:
+// step through, then step backward through the returns.
+fn countdown(n: int) {
+    if n < 0 {
+        return;
+    }
+    print(n);
+    countdown(n - 1);
+}
+
+fn main() {
+    countdown(3);
+}

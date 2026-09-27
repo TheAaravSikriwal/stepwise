@@ -1,0 +1,16 @@
+// Euclid's algorithm for the greatest common divisor, over 2,000 years old.
+// Step through and watch `x` and `y` shrink until `y` reaches 0.
+fn gcd(a: int, b: int) -> int {
+    let mut x = a;
+    let mut y = b;
+    while y != 0 {
+        let remainder = x % y;
+        x = y;
+        y = remainder;
+    }
+    return x;
+}
+
+fn main() {
+    print(gcd(48, 18));
+}

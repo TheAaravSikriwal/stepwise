@@ -1,0 +1,16 @@
+// The Collatz sequence: halve even numbers, and turn odd numbers into 3n + 1.
+// Nobody has proved that it always reaches 1, but it always has so far.
+fn main() {
+    let mut n = 6;
+    let mut steps = 0;
+    while n != 1 {
+        print(n);
+        if n % 2 == 0 {
+            n = n / 2;
+        } else {
+            n = 3 * n + 1;
+        }
+        steps = steps + 1;
+    }
+    print(steps);
+}

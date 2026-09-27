@@ -11,6 +11,10 @@
     <header>
       <h1>Stepwise</h1>
       <button id="run" type="button" title="Run (Ctrl+Enter)">Run</button>
+      <select id="examples" aria-label="Load an example"></select>
+
+      <button id="share" type="button" class="secondary" title="Copy a link to this program">Share</button>
+      <span id="share-status" class="notice" aria-live="polite"></span>
       <div class="controls" role="toolbar" aria-label="Step controls">
         <button id="to-start" type="button" class="secondary" title="Go to the start (Home)" aria-label="Go to the start">⏮</button>
         <button id="step-back" type="button" class="secondary" title="Step back (←, or Alt+← in the editor)">◀ Back</button>

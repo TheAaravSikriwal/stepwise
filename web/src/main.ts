@@ -1,40 +1,35 @@
 // The playground page: editor, Run, and the debugger panels.
 
 import { createEditor } from "./editor/editor";
+import { EXAMPLES } from "./examples";
 import { DEMO_DEBUG, DEMO_SOURCE, createDemoReplay } from "./replay/demo";
 import { createReplay } from "./replay/replay";
 import { describeOutcome } from "./runtime/run";
 import { outputOf } from "./runtime/trace";
+import { decodeProgram, encodeProgram } from "./share";
 import { Debugger } from "./ui/debugger";
 import { Runner } from "./worker/client";
 
-const EXAMPLE = `fn factorial(n: int) -> int {
-    if n <= 1 {
-        return 1;
-    }
-    return n * factorial(n - 1);
-}
-
-fn main() {
-    let mut total = 0;
-    let mut i = 1;
-    while i <= 5 {
-        total = total + factorial(i);
-        i = i + 1;
-    }
-    print(total);
-}
-`;
-
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 
+const params = new URLSearchParams(location.search);
 // `?demo` previews the debugger with a canned session (no compiler or replay needed).
-const demo = new URLSearchParams(location.search).has("demo");
+const demo = params.has("demo");
+const DEFAULT_EXAMPLE = "factorial";
+
+/** What to show on load: a shared program, `?example=<id>`, or the default example. */
+async function initialSource(): Promise<string> {
+  if (demo) return DEMO_SOURCE;
+  const shared = await decodeProgram(location.hash);
+  if (shared !== null) return shared;
+  const id = params.get("example") ?? DEFAULT_EXAMPLE;
+  return (EXAMPLES.find((e) => e.id === id) ?? EXAMPLES.find((e) => e.id === DEFAULT_EXAMPLE))?.source ?? "";
+}
 
 const output = $<HTMLPreElement>("#output");
 const runButton = $<HTMLButtonElement>("#run");
 const runner = new Runner();
-const editor = createEditor($("#editor"), demo ? DEMO_SOURCE : EXAMPLE, runProgram);
+const editor = createEditor($("#editor"), await initialSource(), runProgram);
 const debug = new Debugger(
   {
     output,
@@ -101,6 +96,35 @@ async function runProgram(): Promise<void> {
 }
 
 runButton.addEventListener("click", runProgram);
+
+// Example gallery
+const examples = $<HTMLSelectElement>("#examples");
+examples.append(new Option("Examples…", ""), ...EXAMPLES.map((e) => new Option(e.title, e.id)));
+examples.addEventListener("change", () => {
+  const example = EXAMPLES.find((e) => e.id === examples.value);
+  examples.value = "";
+  if (!example) return;
+  editor.setSource(example.source); // Ctrl+Z brings back what was there
+  history.replaceState(null, "", `?example=${example.id}`);
+  output.replaceChildren();
+  editor.showDiagnostics([]);
+});
+
+// Share: put the program in the URL and copy it
+const shareStatus = $("#share-status");
+$<HTMLButtonElement>("#share").addEventListener("click", async () => {
+  const url = new URL(location.href);
+  url.search = "";
+  url.hash = await encodeProgram(editor.source());
+  history.replaceState(null, "", url);
+  try {
+    await navigator.clipboard.writeText(url.href);
+    shareStatus.textContent = "Link copied";
+  } catch {
+    shareStatus.textContent = "Copy the link from the address bar";
+  }
+  setTimeout(() => (shareStatus.textContent = ""), 3000);
+});
 
 // Dev-only handle for poking at the page from the browser console.
 if (import.meta.env.DEV) Object.assign(window, { __stepwise: { editor, runner, debug, runProgram } });

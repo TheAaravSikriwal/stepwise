@@ -1,0 +1,11 @@
+// FIND THE BUG: this should print 1 + 2 + ... + 10 = 55, but it prints 45.
+// Step through it and watch `i` and `sum`. When does the loop stop, and why?
+fn main() {
+    let mut sum = 0;
+    let mut i = 1;
+    while i < 10 {
+        sum = sum + i;
+        i = i + 1;
+    }
+    print(sum);
+}

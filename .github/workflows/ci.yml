@@ -30,7 +30,7 @@ jobs:
         run: cargo test -p stepwise-compiler --test checker
         continue-on-error: true
       - name: "In progress: codegen"
-        run: cargo test -p stepwise-compiler --test codegen
+        run: cargo test -p stepwise-compiler --test codegen --test examples
         continue-on-error: true
 
   web:

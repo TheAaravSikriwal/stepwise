@@ -1,0 +1,15 @@
+// `&&` and `||` stop early when they already know the answer.
+// `check` prints its label, so you can see which calls actually happen.
+fn check(value: bool, label: int) -> bool {
+    print(label);
+    return value;
+}
+
+fn main() {
+    // `false && ...` is false whatever comes next, so check 2 never runs.
+    let a = check(false, 1) && check(true, 2);
+    // `true || ...` is true whatever comes next, so check 4 never runs.
+    let b = check(true, 3) || check(false, 4);
+    print(a);
+    print(b);
+}

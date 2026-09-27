@@ -21,6 +21,8 @@ import { stepwise } from "./language";
 export interface Editor {
   view: EditorView;
   source(): string;
+  /** Replaces the whole program (undoable with Ctrl+Z). */
+  setSource(text: string): void;
   /** Shows compiler diagnostics as underlines, or clears them with `[]`. */
   showDiagnostics(diags: Diagnostic[]): void;
   /** Highlights the debugger's current step (and scrolls to it), or clears it with `null`. */
@@ -88,6 +90,9 @@ export function createEditor(parent: HTMLElement, doc: string, onRun: () => void
   return {
     view,
     source: () => view.state.doc.toString(),
+    setSource(text) {
+      view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: text } });
+    },
     showDiagnostics(diags) {
       view.dispatch(setDiagnostics(view.state, toLint(diags, view.state.doc.length)));
     },
