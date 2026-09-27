@@ -1,0 +1,25 @@
+name: Confusing error message
+description: An error message that didn't help you understand what was wrong
+labels: [error-messages]
+body:
+  - type: markdown
+    attributes:
+      value: Error messages are meant to be the friendliest part of Stepwise. If one confused you, that's a bug.
+  - type: textarea
+    id: program
+    attributes:
+      label: The program
+      render: rust
+    validations:
+      required: true
+  - type: textarea
+    id: message
+    attributes:
+      label: The message you got
+    validations:
+      required: true
+  - type: textarea
+    id: better
+    attributes:
+      label: What would have helped?
+      description: What the real problem was, or how you'd have liked it explained.
