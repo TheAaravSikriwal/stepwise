@@ -27,23 +27,68 @@ picked up again (section 7.4).
 
 ## 2. Who writes what
 
-| Area | Owner | Why |
-|---|---|---|
-| Lexer, parser, name resolution, type checker | **You** | Interview material, and the heart of the compiler |
-| Code generation and instrumentation (trace calls) | **You** | Same |
-| Replay engine (apply/undo, snapshots, state reconstruction) | **You** | The most interesting part of the project |
-| Specs, interfaces and **failing tests** for each core piece | Me | So you always know exactly what "correct" means |
-| Code review of your core code, plus a hint ladder when you're stuck | Me | See section 7.2 |
-| Repo, build, toolchain, CI | Me | Plumbing |
-| `span.rs`, diagnostic types, pretty error rendering, debug-table format | Me | Shared contracts that everything else depends on |
-| `compiler-wasm` wrapper, Web Worker protocol, runtime host functions, trace buffer, step limit, trap handling | Me | Plumbing, though it touches the core |
-| Editor (CodeMirror), panels, controls, keyboard shortcuts, styling | Me | UI |
-| Test harnesses (golden programs, error snapshots, WASM validation, replay properties) | Me | So your code is checked automatically |
-| Example programs, docs, landing page | Shared | I draft, you edit |
+**Changed on 2026-09-27: I (Claude) build everything, core included.** At the start the core was
+assigned to you, and everything below was prepared that way: a spec and a failing test suite for
+each piece. You expected the whole thing to be built, so I now write the core against those specs
+and tests. The interview goal still holds, so the core is written to be read: one idea per
+function, comments that explain *why*, and a walkthrough of each piece whenever you want one.
 
-**My rule:** I won't write core code, even when it would be faster. When reviewing, I point at the
-problem and explain it; I don't hand over the fix. You can override this for any specific piece by
-saying "just write it", and that override applies only to the piece you name.
+| Area | Owner |
+|---|---|
+| Lexer, parser, checker, codegen and instrumentation, replay engine | Me, against `docs/specs/` and the existing tests |
+| Everything else (plumbing, UI, tests, CI, docs) | Me, already built |
+| Testing the finished app, and deciding when it goes on wearechintu.com | **You** |
+
+## 2a. The core build plan
+
+**Goal:** your "tour" program (and every gallery example) runs in the playground, can be stepped
+through in both directions, and gets a plain-English explanation of every step. Then, and only
+then, it's ready for you to test for the website.
+
+**Order.** Each stage builds on the one before, and each ends at a hard gate:
+
+| # | Piece | Gate (all must pass) | Then |
+|---|---|---|---|
+| 1 | Lexer (`lexer.rs`) | `--test lexer` (29) | `PIPELINE = Lexer` |
+| 2 | Parser (`parser.rs`) | `--test parser --test parser_depth` (47) | `PIPELINE = Parser` |
+| 3 | Checker (`checker.rs`) | `--test checker` (58); review every message in `--test error_messages` (15) before accepting the snapshots | `PIPELINE = Checker` |
+| 4 | Codegen + instrumentation (`codegen.rs`) | `--test codegen --test examples --test phase0`; the web golden test (22 programs in the browser runtime) | `PIPELINE = Codegen` |
+| 5 | Replay engine (`replay.ts`) | `tests/replay` (18 correctness + 4 speed) | stepping switches on |
+| 6 | Integration | everything below | the release checklist |
+
+**Stage 6: done means all of these:**
+- Every test in both repos passes, and every CI step is **required** (no "in progress" steps left).
+- `cargo clippy -D warnings` and `cargo fmt --check` are clean.
+- The tour program is added as a golden test with its exact expected output.
+- It's checked by hand in the browser: every gallery example runs and steps, forward and backward;
+  the explainer reads correctly on recursion, loops and short-circuiting; breakpoints, step over
+  and step out work; broken programs give the right messages; runaway loops and division by zero
+  stop cleanly.
+- The docs match reality: how-it-works describes the replay design as actually built, STATUS and
+  CHANGELOG are current, and the stub and its "compiler unfinished" code paths are removed.
+
+**Design choices, made now so they don't drift:**
+- The lexer works on bytes, decoding a `char` only for non-ASCII error reporting.
+- The parser is recursive descent, one function per grammar rule, with panic-mode recovery at
+  statement boundaries, the missing-`;` special case, and a depth limit of 200.
+- The checker makes two passes (signatures, then bodies). A scope stack maps names to `VarId`s. An
+  internal error type (`Option<Type>`) stops cascades. "Every path returns" is a small separate
+  function.
+- Codegen uses one `FnCompiler` per function, with `local.tee` for old values, `scope_exit` for every
+  open block on `return`, short-circuit `&&`/`||`, and `unreachable` at the end of a function that
+  returns a value.
+- The replay engine is **snapshots only** (option (b) in §3.2): a full copy of the state every 1,000
+  steps, and every seek loads the nearest earlier snapshot and applies events forward. It has one
+  code path for both directions, so there's less to go wrong. The speed tests prove it's fast enough.
+
+**Risks and what to do about them:**
+- *A test turns out wrong once real code exists.* Every suite was validated against a throwaway
+  implementation, so this is unlikely. If it happens, fix the test and record why in the commit.
+- *The wasm build behaves differently from native.* The web golden test runs the same 22 programs
+  through the browser runtime.
+- *Error messages read badly.* Read all 15 snapshots before accepting them, and fix the wording in
+  the checker rather than accepting it as it is.
+- *The session ends mid-stage.* Commit after each stage passes, and keep STATUS.md current.
 
 ---
 
