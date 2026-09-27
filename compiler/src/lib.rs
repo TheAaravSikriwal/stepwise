@@ -38,7 +38,7 @@ pub enum Stage {
 
 /// **Bump this when a stage passes its tests** (then run `npm run wasm` in
 /// `web/` and try some broken programs in the playground).
-pub const PIPELINE: Stage = Stage::Stub;
+pub const PIPELINE: Stage = Stage::Codegen;
 
 #[derive(Debug)]
 pub struct CompileOutput {

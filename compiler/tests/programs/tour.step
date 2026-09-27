@@ -1,0 +1,117 @@
+// expect: 120
+// expect: true
+// expect: true
+// expect: 12
+// expect: 17
+// expect: 1
+// expect: 3
+// expect: false
+// expect: true
+// expect: -3
+// expect: -2
+// expect: -2147483648
+// expect: 30
+// expect: 0
+// expect: 3
+// expect: 2
+// expect: 1
+// expect: 0
+// The "tour" program: every feature at once (recursion, mutual recursion,
+// nested loops with an early return, short-circuiting, integer edge cases,
+// per-pass loop variables, else-if chains, and a function with no answer).
+
+fn factorial(n: int) -> int {
+    if n <= 1 {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+fn is_even(n: int) -> bool {
+    if n == 0 {
+        return true;
+    }
+    return is_odd(n - 1);
+}
+
+fn is_odd(n: int) -> bool {
+    if n == 0 {
+        return false;
+    }
+    return is_even(n - 1);
+}
+
+fn gcd(a: int, b: int) -> int {
+    let mut x = a;
+    let mut y = b;
+    while y != 0 {
+        let rest = x % y;
+        x = y;
+        y = rest;
+    }
+    return x;
+}
+
+fn first_pair_summing_to(target: int) -> int {
+    let mut i = 1;
+    while i < 10 {
+        let mut j = i;
+        while j < 10 {
+            if i * i + j * j == target {
+                return i * 10 + j;
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    return -1;
+}
+
+fn check(value: bool, label: int) -> bool {
+    print(label);
+    return value;
+}
+
+fn countdown(n: int) {
+    if n < 0 {
+        return;
+    }
+    print(n);
+    countdown(n - 1);
+}
+
+fn sign(n: int) -> int {
+    if n > 0 {
+        return 1;
+    } else if n < 0 {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
+fn main() {
+    print(factorial(5));
+    print(is_even(6));
+    print(is_odd(7));
+    print(gcd(84, 36));
+    print(first_pair_summing_to(50));
+    let both = check(false, 1) && check(true, 2);
+    let either = check(true, 3) || check(false, 4);
+    print(both);
+    print(either);
+    print(-17 / 5);
+    print(-17 % 5);
+    let biggest = 2147483647;
+    print(biggest + 1);
+    let mut total = 0;
+    let mut k = 1;
+    while k <= 4 {
+        let square = k * k;
+        total = total + square;
+        k = k + 1;
+    }
+    print(total);
+    print(sign(-8) + sign(0) + sign(3));
+    countdown(3);
+}
