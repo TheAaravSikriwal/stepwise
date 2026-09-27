@@ -1,0 +1,6 @@
+/target
+node_modules/
+web/pkg/
+web/dist/
+*.log
+.DS_Store

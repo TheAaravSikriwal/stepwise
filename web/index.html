@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stepwise</title>
+    <meta name="description" content="Write code, run it in your browser, and step backward through every line." />
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Stepwise</h1>
+      <button id="run" type="button" title="Run (Ctrl+Enter)">Run</button>
+    </header>
+    <main>
+      <section class="panel editor-panel">
+        <h2>Code</h2>
+        <textarea id="source" spellcheck="false" aria-label="Program source"></textarea>
+      </section>
+      <section class="panel">
+        <h2>Output</h2>
+        <pre id="output" aria-live="polite"></pre>
+      </section>
+    </main>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
