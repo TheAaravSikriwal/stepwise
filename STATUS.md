@@ -4,6 +4,11 @@ _Last updated: 2026-09-27_
 
 ## Where we are
 
+**Debugger UI is built** (call stack, variables with change highlights, output synced to the step,
+step buttons, timeline, keyboard shortcuts). Preview it without a compiler or replay engine at
+`http://localhost:5173/?demo`. With the real pipeline it switches on automatically once
+`createReplay` works.
+
 **Step 0 is done.** A stub `compile()` returns a hand-built WebAssembly module equivalent to
 `fn main() { print(42); }`, including the trace calls. It runs:
 
@@ -26,12 +31,12 @@ trap messages, and worker protocol.
      types in `compiler/src/checked.rs` are a shared draft.
   4. **Codegen:** `docs/specs/codegen.md`, then `cargo test --test codegen` (7 exact traces, the
      steps table, and 22 golden programs in `compiler/tests/programs/`).
-  5. After each stage passes, bump `PIPELINE` in `compiler/src/lib.rs` (Lexer â†’ Parser â†’ Checker â†’
+  5. After each stage passes, bump `PIPELINE` in `compiler/src/lib.rs` (Lexer Ã¢â€ â€™ Parser Ã¢â€ â€™ Checker Ã¢â€ â€™
      Codegen), run `npm run wasm` in `web/`, and try broken programs in the playground.
   6. **Replay engine** (independent of the compiler, so do it whenever): `docs/specs/replay.md`,
      then `cd web && npx vitest run tests/replay` (18 correctness + 4 speed tests).
   7. When a piece passes, move its step in `.github/workflows/ci.yml` up into the required tests.
-- **My track:** Step 5 prep: the debugger UI (variables, call stack, output synced to steps, step controls) built against a fake replay engine, plus the replay engine spec and property tests.
+- **My track:** v1.0 plumbing: shareable links (program in the URL), the example gallery, the one-page language reference, and the "How it works" page.
 
 Every test file has been checked against a throwaway reference implementation (outside the
 repo, deleted afterwards), so if a test fails, the bug is in the code under test, not the test.

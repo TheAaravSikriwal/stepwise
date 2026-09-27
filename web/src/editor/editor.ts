@@ -1,11 +1,13 @@
 // The code editor: CodeMirror 6 with Stepwise highlighting, compiler error
-// underlines, and Ctrl/Cmd+Enter to run.
+// underlines, the debugger's current-step highlight, and Ctrl/Cmd+Enter to run.
 
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { bracketMatching, indentOnInput, indentUnit } from "@codemirror/language";
 import { type Diagnostic as LintDiagnostic, lintGutter, setDiagnostics } from "@codemirror/lint";
-import { EditorState } from "@codemirror/state";
+import { EditorState, StateEffect, StateField } from "@codemirror/state";
 import {
+  Decoration,
+  type DecorationSet,
   EditorView,
   drawSelection,
   highlightActiveLine,
@@ -13,7 +15,7 @@ import {
   keymap,
   lineNumbers,
 } from "@codemirror/view";
-import type { Diagnostic } from "../compiler";
+import type { Diagnostic, Range } from "../compiler";
 import { stepwise } from "./language";
 
 export interface Editor {
@@ -21,9 +23,41 @@ export interface Editor {
   source(): string;
   /** Shows compiler diagnostics as underlines, or clears them with `[]`. */
   showDiagnostics(diags: Diagnostic[]): void;
+  /** Highlights the debugger's current step (and scrolls to it), or clears it with `null`. */
+  showStep(range: Range | null): void;
+  /** 1-based line number of an offset. */
+  lineOf(offset: number): number;
+  /** Called after every edit. */
+  onChange(listener: () => void): void;
 }
 
+const setStep = StateEffect.define<Range | null>();
+
+const stepHighlight = StateField.define<DecorationSet>({
+  create: () => Decoration.none,
+  update(deco, tr) {
+    deco = deco.map(tr.changes);
+    for (const effect of tr.effects) {
+      if (!effect.is(setStep)) continue;
+      if (!effect.value) {
+        deco = Decoration.none;
+        continue;
+      }
+      const len = tr.state.doc.length;
+      const from = Math.min(effect.value.from, len);
+      const to = Math.min(Math.max(effect.value.to, from), len);
+      const line = tr.state.doc.lineAt(from);
+      const ranges = [Decoration.line({ class: "cm-stepLine" }).range(line.from)];
+      if (to > from) ranges.push(Decoration.mark({ class: "cm-stepRange" }).range(from, to));
+      deco = Decoration.set(ranges, true);
+    }
+    return deco;
+  },
+  provide: (field) => EditorView.decorations.from(field),
+});
+
 export function createEditor(parent: HTMLElement, doc: string, onRun: () => void): Editor {
+  const listeners: (() => void)[] = [];
   const runKey = { key: "Mod-Enter", run: () => (onRun(), true), preventDefault: true };
   const view = new EditorView({
     parent,
@@ -40,9 +74,13 @@ export function createEditor(parent: HTMLElement, doc: string, onRun: () => void
         indentUnit.of("    "),
         EditorState.tabSize.of(4),
         lintGutter(),
+        stepHighlight,
         keymap.of([runKey, ...defaultKeymap, ...historyKeymap, indentWithTab]),
         stepwise,
         EditorView.contentAttributes.of({ "aria-label": "Program source", spellcheck: "false" }),
+        EditorView.updateListener.of((u) => {
+          if (u.docChanged) for (const l of listeners) l();
+        }),
       ],
     }),
   });
@@ -53,6 +91,16 @@ export function createEditor(parent: HTMLElement, doc: string, onRun: () => void
     showDiagnostics(diags) {
       view.dispatch(setDiagnostics(view.state, toLint(diags, view.state.doc.length)));
     },
+    showStep(range) {
+      const effects: StateEffect<unknown>[] = [setStep.of(range)];
+      if (range) {
+        const pos = Math.min(range.from, view.state.doc.length);
+        effects.push(EditorView.scrollIntoView(pos, { y: "nearest" }));
+      }
+      view.dispatch({ effects });
+    },
+    lineOf: (offset) => view.state.doc.lineAt(Math.min(offset, view.state.doc.length)).number,
+    onChange: (listener) => void listeners.push(listener),
   };
 }
 

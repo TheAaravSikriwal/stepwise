@@ -11,16 +11,34 @@
     <header>
       <h1>Stepwise</h1>
       <button id="run" type="button" title="Run (Ctrl+Enter)">Run</button>
+      <div class="controls" role="toolbar" aria-label="Step controls">
+        <button id="to-start" type="button" class="secondary" title="Go to the start (Home)" aria-label="Go to the start">⏮</button>
+        <button id="step-back" type="button" class="secondary" title="Step back (←, or Alt+← in the editor)">◀ Back</button>
+        <button id="step-forward" type="button" class="secondary" title="Step forward (→, or Alt+→ in the editor)">Forward ▶</button>
+        <button id="to-end" type="button" class="secondary" title="Go to the end (End)" aria-label="Go to the end">⏭</button>
+        <input id="timeline" type="range" min="0" max="0" value="0" aria-label="Timeline" />
+        <span id="step-label" aria-live="polite"></span>
+      </div>
     </header>
     <main>
       <section class="panel editor-panel">
         <h2>Code</h2>
         <div id="editor"></div>
       </section>
-      <section class="panel">
-        <h2>Output</h2>
-        <pre id="output" aria-live="polite"></pre>
-      </section>
+      <div class="side">
+        <section class="panel">
+          <h2>Call stack</h2>
+          <div id="stack" class="stack"></div>
+        </section>
+        <section class="panel">
+          <h2>Variables</h2>
+          <div id="vars" class="vars"></div>
+        </section>
+        <section class="panel output-panel">
+          <h2>Output</h2>
+          <pre id="output" aria-live="polite"></pre>
+        </section>
+      </div>
     </main>
     <script type="module" src="./src/main.ts"></script>
   </body>
