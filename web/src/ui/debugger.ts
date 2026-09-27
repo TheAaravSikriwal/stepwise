@@ -48,6 +48,8 @@ interface Explanation {
   lines: string[];
   next?: string | null;
   tip?: string;
+  /** A button offering the obvious fix. */
+  action?: { label: string; run: () => void };
 }
 
 const TIPS = [
@@ -135,6 +137,53 @@ export class Debugger {
         "The red underline in your code shows where. The Output panel says what's wrong and how to fix it.",
         "Fix it, then press ▶ Run again.",
       ],
+    });
+  }
+
+  /** Demo mode, but the editor holds something other than the demo's program. */
+  demoOnly(loadDemo: () => void): void {
+    this.stop();
+    this.emptyPanels();
+    this.el.output.replaceChildren(notice("Nothing ran."));
+    this.explain({
+      tone: "problem",
+      label: "Demo mode only knows one program",
+      lines: [
+        "This page is a demo: it can only step through its own small example, not the code in the editor.",
+        "Stepping through your own programs works once Stepwise's compiler is finished.",
+      ],
+      action: {
+        label: "Show the demo program",
+        run: () => {
+          loadDemo();
+          this.idle();
+        },
+      },
+    });
+  }
+
+  /** The compiler is still being built, so what ran was a placeholder. */
+  compilerUnfinished(): void {
+    this.stop();
+    this.emptyPanels();
+    this.el.output.replaceChildren(notice("Nothing to show: your program didn't really run."));
+    this.explain({
+      tone: "problem",
+      label: "Stepwise's compiler isn't finished yet",
+      lines: [
+        "It can't run your code yet, so nothing on screen would be your program's real output.",
+        "To see how stepping through a program will work, open the demo.",
+      ],
+      action: {
+        label: "Open the demo",
+        run: () => {
+          // Keep ?embed and ?theme, so the demo still fits the page it's framed in.
+          const url = new URL(location.href);
+          url.searchParams.set("demo", "");
+          url.hash = "";
+          location.assign(url);
+        },
+      },
     });
   }
 
@@ -257,6 +306,14 @@ export class Debugger {
     for (const line of e.lines) list.append(rich("li", line));
     const nodes: Node[] = [label, list];
     if (e.next) nodes.push(rich("p", e.next, "explain-next"));
+    if (e.action) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "explain-action";
+      button.textContent = e.action.label;
+      button.addEventListener("click", e.action.run);
+      nodes.push(button);
+    }
     if (e.tip) nodes.push(rich("p", e.tip, "explain-tip"));
     box.replaceChildren(...nodes);
   }

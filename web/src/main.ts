@@ -68,6 +68,13 @@ async function runProgram(): Promise<void> {
   runButton.disabled = true;
   try {
     if (demo) {
+      // The demo is a recording of one built-in program. Playing it over
+      // anything else would highlight lines and show variables that aren't
+      // in the code on screen.
+      if (editor.source().trim() !== DEMO_SOURCE.trim()) {
+        debug.demoOnly(() => editor.setSource(DEMO_SOURCE));
+        return;
+      }
       const index = createDemoStepIndex(editor.lineOf);
       debug.load({ replay: createDemoReplay(), debug: DEMO_DEBUG, source: DEMO_SOURCE, index, endMessage: null });
       return;
@@ -86,6 +93,12 @@ async function runProgram(): Promise<void> {
         break;
       case "ran": {
         editor.showDiagnostics(res.meta.diagnostics); // warnings, if any
+        // An unfinished compiler runs a placeholder, not this program: say so
+        // rather than show output that isn't the program's.
+        if (!res.realCompiler) {
+          debug.compilerUnfinished();
+          break;
+        }
         const endMessage = describeOutcome(res.outcome);
         try {
           const replay = createReplay(res.trace, res.meta.debug);

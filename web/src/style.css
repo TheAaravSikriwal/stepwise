@@ -372,6 +372,18 @@ button.quiet {
   color: var(--link);
 }
 
+.explain-action {
+  margin-top: 0.55rem;
+  background: var(--cobalt);
+  border-color: var(--cobalt);
+  color: var(--white);
+}
+
+.explain-action:hover:not(:disabled) {
+  background: var(--cobalt-dark);
+  border-color: var(--cobalt-dark);
+}
+
 .explain-tip {
   margin: 0.35rem 0 0;
   font-size: 0.875rem;
