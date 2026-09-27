@@ -1,0 +1,12 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/int_condition.step
+---
+error: a condition has to be `true` or `false`, but this is an `int`
+ --> int_condition.step:3:8
+  |
+3 |     if n {
+  |        ^
+  |
+  = note: if you meant "is not zero", write `n != 0`

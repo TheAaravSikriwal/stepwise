@@ -1,0 +1,14 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/shadowing.step
+---
+error: there's already a variable named `x` here
+ --> shadowing.step:4:13
+  |
+4 |         let x = 2;
+  |             ^
+2 |     let x = 1;
+  |         - first made here
+  |
+  = note: pick a different name: two variables can't share a name while both exist

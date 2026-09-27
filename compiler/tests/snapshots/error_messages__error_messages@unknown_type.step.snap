@@ -1,0 +1,20 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/unknown_type.step
+---
+error: there's no type called `integer`
+ --> unknown_type.step:1:14
+  |
+1 | fn double(n: integer) -> integer {
+  |              ^^^^^^^
+  |
+  = note: the types are `int` (whole numbers) and `bool` (true or false)
+
+error: there's no type called `integer`
+ --> unknown_type.step:1:26
+  |
+1 | fn double(n: integer) -> integer {
+  |                          ^^^^^^^
+  |
+  = note: the types are `int` (whole numbers) and `bool` (true or false)

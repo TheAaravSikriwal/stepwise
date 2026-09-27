@@ -1,0 +1,12 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/missing_return.step
+---
+error: `sign` doesn't give back a value on every path
+ --> missing_return.step:1:4
+  |
+1 | fn sign(n: int) -> int {
+  |    ^^^^
+  |
+  = note: add a `return` at the end, for when none of the other `return`s run

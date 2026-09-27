@@ -1,0 +1,12 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/missing_semicolon.step
+---
+error: expected `;` at the end of this statement
+ --> missing_semicolon.step:2:14
+  |
+2 |     let x = 5
+  |              ^
+  |
+  = note: every statement ends with a semicolon

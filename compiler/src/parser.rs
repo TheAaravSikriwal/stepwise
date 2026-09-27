@@ -260,11 +260,13 @@ impl Parser<'_> {
                     });
                 }
                 K::Eof => {
+                    // Point at the `{` itself: the end of the file is the
+                    // least helpful place to look.
                     if !self.too_deep {
-                        let span = self.peek().span;
                         self.diagnostics.push(
-                            Diagnostic::error("expected `}` before the end of the file", span)
-                                .with_label(open, "this `{` is never closed"),
+                            Diagnostic::error("this `{` is never closed", open).with_note(
+                                "every `{` needs a matching `}`. Add the missing `}` where this block should end",
+                            ),
                         );
                     }
                     return None;

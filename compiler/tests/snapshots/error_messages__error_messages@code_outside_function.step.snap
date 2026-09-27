@@ -1,0 +1,12 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/code_outside_function.step
+---
+error: expected `fn` here
+ --> code_outside_function.step:1:1
+  |
+1 | let x = 5;
+  | ^^^
+  |
+  = note: all code must be inside a function, like `fn main() { ... }`

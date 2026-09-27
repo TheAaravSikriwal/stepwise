@@ -1,0 +1,14 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/assign_immutable.step
+---
+error: `count` can't be changed, because it wasn't made with `mut`
+ --> assign_immutable.step:3:5
+  |
+3 |     count = count + 1;
+  |     ^^^^^
+2 |     let count = 0;
+  |         ----- made here
+  |
+  = note: to allow changes, make it with `let mut count`

@@ -1,0 +1,10 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/missing_paren.step
+---
+error: expected `)` to close the function call
+ --> missing_paren.step:2:16
+  |
+2 |     print(1 + 2;
+  |                ^

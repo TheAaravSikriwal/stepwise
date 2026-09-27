@@ -1,0 +1,12 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/unclosed_brace.step
+---
+error: this `{` is never closed
+ --> unclosed_brace.step:1:11
+  |
+1 | fn main() {
+  |           ^
+  |
+  = note: every `{` needs a matching `}`. Add the missing `}` where this block should end

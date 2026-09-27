@@ -1,0 +1,12 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/unknown_variable.step
+---
+error: there's no variable named `totl`
+ --> unknown_variable.step:3:11
+  |
+3 |     print(totl);
+  |           ^^^^
+  |
+  = note: did you mean `total`?

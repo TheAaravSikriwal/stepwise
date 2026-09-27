@@ -1,0 +1,12 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/chained_comparison.step
+---
+error: comparisons can't be chained
+ --> chained_comparison.step:3:20
+  |
+3 |     let ok = 1 < x < 5;
+  |                    ^
+  |
+  = note: to check both, write them separately: `a < b && b < c`

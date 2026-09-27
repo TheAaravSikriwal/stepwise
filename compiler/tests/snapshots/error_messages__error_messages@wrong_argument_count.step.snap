@@ -1,0 +1,10 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/wrong_argument_count.step
+---
+error: `add` needs 2 values, but was given 1
+ --> wrong_argument_count.step:6:11
+  |
+6 |     print(add(1));
+  |           ^^^^^^

@@ -1,0 +1,12 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/no_main.step
+---
+error: this program has no `fn main()` to start from
+ --> no_main.step:1:1
+  |
+1 | fn helper() {
+  | ^
+  |
+  = note: add `fn main() { ... }`: it's where every program starts

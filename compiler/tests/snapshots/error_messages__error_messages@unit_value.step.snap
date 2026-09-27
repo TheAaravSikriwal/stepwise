@@ -1,0 +1,12 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/unit_value.step
+---
+error: `greet` doesn't give back a value, so it can't be used here
+ --> unit_value.step:6:13
+  |
+6 |     let x = greet();
+  |             ^^^^^^^
+  |
+  = note: only functions with `->` after their parameters give back a value

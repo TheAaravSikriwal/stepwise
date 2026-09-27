@@ -1,0 +1,10 @@
+---
+source: compiler/tests/error_messages.rs
+expression: "rendered.join(\"\\n\")"
+input_file: compiler/tests/errors/type_mismatch.step
+---
+error: `+` works with numbers (`int`s), but this is a `bool`
+ --> type_mismatch.step:3:21
+  |
+3 |     let wrong = n + true;
+  |                     ^^^^
