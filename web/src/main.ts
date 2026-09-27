@@ -34,6 +34,7 @@ const runner = new Runner();
 const editor = createEditor($("#editor"), await initialSource(), runProgram);
 const debug = new Debugger(
   {
+    explain: $("#explain"),
     output,
     stack: $("#stack"),
     vars: $("#vars"),
@@ -53,7 +54,7 @@ const debug = new Debugger(
 
 // A recording only matches the code it came from.
 editor.onChange(() => {
-  if (debug.active) debug.clear("The code changed. Press Run to debug it again.");
+  if (debug.active) debug.codeChanged();
 });
 
 function line(text: string, className?: string): HTMLElement {
@@ -68,16 +69,20 @@ async function runProgram(): Promise<void> {
   try {
     if (demo) {
       const index = createDemoStepIndex(editor.lineOf);
-      debug.load({ replay: createDemoReplay(), debug: DEMO_DEBUG, index, endMessage: null });
+      debug.load({ replay: createDemoReplay(), debug: DEMO_DEBUG, source: DEMO_SOURCE, index, endMessage: null });
       return;
     }
-    const res = await runner.run(editor.source());
+    const source = editor.source();
+    const res = await runner.run(source);
     if (res.type === "internal-error" && res.message === "cancelled") return;
     switch (res.type) {
       case "compile-error":
         editor.showDiagnostics(res.meta.diagnostics);
-        debug.clear("Fix the errors in your code, then press Run again.");
-        output.replaceChildren(...res.meta.diagnostics.map((d) => line(d.rendered, "error")));
+        {
+          const errors = res.meta.diagnostics.filter((d) => d.severity === "error");
+          debug.problems(errors.length);
+          output.replaceChildren(...res.meta.diagnostics.map((d) => line(d.rendered, "error")));
+        }
         break;
       case "ran": {
         editor.showDiagnostics(res.meta.diagnostics); // warnings, if any
@@ -85,16 +90,16 @@ async function runProgram(): Promise<void> {
         try {
           const replay = createReplay(res.trace, res.meta.debug);
           const index = StepIndex.fromTrace(res.trace, res.meta.debug, editor.lineOf);
-          debug.load({ replay, debug: res.meta.debug, index, endMessage });
+          debug.load({ replay, debug: res.meta.debug, source, index, endMessage });
         } catch (e) {
           // No replay engine yet (or it crashed): still show the output.
-          debug.showOutputOnly(outputOf(res.trace), endMessage, `Stepping isn't available: ${(e as Error).message}`);
+          debug.showOutputOnly(outputOf(res.trace), endMessage, (e as Error).message);
         }
         break;
       }
       case "internal-error":
         editor.showDiagnostics([]);
-        debug.clear("Something went wrong. See the output panel.");
+        debug.failed();
         output.replaceChildren(line(res.message, "error"));
         break;
     }
@@ -105,9 +110,22 @@ async function runProgram(): Promise<void> {
 
 runButton.addEventListener("click", runProgram);
 
+// "More ways to move" closes after a choice, a click elsewhere, or Escape.
+const more = $<HTMLDetailsElement>("details.more");
+more.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => (more.open = false)));
+document.addEventListener("click", (e) => {
+  if (more.open && !more.contains(e.target as Node)) more.open = false;
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && more.open) {
+    more.open = false;
+    more.querySelector("summary")?.focus();
+  }
+});
+
 // Example gallery
 const examples = $<HTMLSelectElement>("#examples");
-examples.append(new Option("Examples…", ""), ...EXAMPLES.map((e) => new Option(e.title, e.id)));
+examples.append(new Option("Open an example…", ""), ...EXAMPLES.map((e) => new Option(e.title, e.id)));
 examples.addEventListener("change", () => {
   const example = EXAMPLES.find((e) => e.id === examples.value);
   examples.value = "";

@@ -21,6 +21,17 @@ function span(text: string, from = 0): Range {
   return { from: start, to: start + text.length };
 }
 
+/** The whole block starting at the first `{` at or after `from`, as the compiler records scopes. */
+function block(from = 0): Range {
+  const start = DEMO_SOURCE.indexOf("{", from);
+  let depth = 0;
+  for (let i = start; i < DEMO_SOURCE.length; i++) {
+    if (DEMO_SOURCE[i] === "{") depth++;
+    if (DEMO_SOURCE[i] === "}" && --depth === 0) return { from: start, to: i + 1 };
+  }
+  return { from: start, to: DEMO_SOURCE.length };
+}
+
 export const DEMO_DEBUG: DebugTable = {
   functions: [{ name: "main", span: span("main") }],
   vars: [
@@ -28,8 +39,8 @@ export const DEMO_DEBUG: DebugTable = {
     { name: "sq", ty: "int", fnId: 0, scopeId: 1, span: span("sq") },
   ],
   scopes: [
-    { fnId: 0, parent: null, span: span("{") },
-    { fnId: 0, parent: 0, span: span("{", DEMO_SOURCE.indexOf("while")) },
+    { fnId: 0, parent: null, span: block() },
+    { fnId: 0, parent: 0, span: block(DEMO_SOURCE.indexOf("while")) },
   ],
   steps: [span("let mut i = 0;"), span("i < 2"), span("let sq = i * i;"), span("i = i + 1;")],
 };

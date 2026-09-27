@@ -8,47 +8,72 @@
     <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
-    <header>
-      <h1>Stepwise</h1>
-      <button id="run" type="button" title="Run (Ctrl+Enter)">Run</button>
-      <select id="examples" aria-label="Load an example"></select>
-
-      <button id="share" type="button" class="secondary" title="Copy a link to this program">Share</button>
-      <span id="share-status" class="notice" aria-live="polite"></span>
-      <div class="controls" role="toolbar" aria-label="Step controls">
-        <button id="to-start" type="button" class="secondary" title="Go to the start (Home)" aria-label="Go to the start">⏮</button>
-        <button id="prev-break" type="button" class="secondary" title="Back to the previous breakpoint (Page Up). Click a line number to set one." aria-label="Previous breakpoint">◀◀</button>
-        <button id="step-back" type="button" class="secondary" title="Step back (←, or Alt+← in the editor)">◀ Back</button>
-        <button id="step-forward" type="button" class="secondary" title="Step forward (→, or Alt+→ in the editor)">Forward ▶</button>
-        <button id="next-break" type="button" class="secondary" title="Continue to the next breakpoint (Page Down). Click a line number to set one." aria-label="Next breakpoint">▶▶</button>
-        <button id="to-end" type="button" class="secondary" title="Go to the end (End)" aria-label="Go to the end">⏭</button>
-        <button id="step-over" type="button" class="secondary" title="Step over: skip past function calls (Shift+→; Shift+click or Shift+← to go back)">Over</button>
-        <button id="step-out" type="button" class="secondary" title="Step out: finish this function (Shift+click to go back to where it was called)">Out</button>
-        <input id="timeline" type="range" min="0" max="0" value="0" aria-label="Timeline" />
-        <span id="step-label" aria-live="polite"></span>
-      </div>
+    <header class="topbar">
+      <h1 class="brand"><a href="./">Stepwise</a></h1>
+      <select id="examples" aria-label="Open an example program"></select>
+      <button id="share" type="button" class="quiet" title="Copy a link to this program, to send to someone">Share</button>
+      <span id="share-status" class="share-status" aria-live="polite"></span>
       <nav>
-        <a href="./language.html">Language</a>
+        <a href="./language.html">The language</a>
         <a href="./how-it-works.html">How it works</a>
       </nav>
     </header>
+
+    <section class="toolbar" aria-label="Run and step through your program">
+      <button id="run" type="button" class="run" title="Run your program (Ctrl+Enter)">▶ Run</button>
+
+      <div class="stepper" role="toolbar" aria-label="Step through your program">
+        <button id="to-start" type="button" title="Go back to the very beginning (Home key)">⏮ Start</button>
+        <button id="step-back" type="button" title="Go back one step (← key)">◀ Back</button>
+        <button id="step-forward" type="button" class="next" title="Run the next line (→ key)">Next step ▶</button>
+        <button id="to-end" type="button" title="Jump to the end (End key)">End ⏭</button>
+        <input id="timeline" type="range" min="0" max="0" value="0" aria-label="Drag to move through the run" />
+        <span id="step-label" class="step-label" aria-live="polite"></span>
+
+        <details class="more">
+          <summary>More ways to move</summary>
+          <div class="menu">
+            <button id="step-over" type="button">
+              <strong>Skip over function calls</strong>
+              <span>Go to the next line here, without going inside functions it calls. Shift + →</span>
+            </button>
+            <button id="step-out" type="button">
+              <strong>Finish this function</strong>
+              <span>Run until the current function is done, and go back to where it was called.</span>
+            </button>
+            <button id="next-break" type="button">
+              <strong>Go to the next stop</strong>
+              <span>Jump ahead to the next time a line with a stop runs. Page Down</span>
+            </button>
+            <button id="prev-break" type="button">
+              <strong>Back to the previous stop</strong>
+              <span>Jump back to the last time a line with a stop ran. Page Up</span>
+            </button>
+            <p class="menu-hint">To put a stop on a line, click just left of its line number.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="explain" class="explain" aria-live="polite"></section>
+
     <main>
       <section class="panel editor-panel">
-        <h2>Code</h2>
+        <h2>Your code</h2>
         <div id="editor"></div>
       </section>
       <div class="side">
         <section class="panel">
-          <h2>Call stack</h2>
-          <div id="stack" class="stack"></div>
-        </section>
-        <section class="panel">
-          <h2>Variables</h2>
+          <h2>Variables <span class="sub">their values right now</span></h2>
           <div id="vars" class="vars"></div>
         </section>
-        <section class="panel output-panel">
-          <h2>Output</h2>
-          <pre id="output" aria-live="polite"></pre>
+        <section class="panel">
+          <h2>Output <span class="sub">what <code>print</code> showed, and any problems</span></h2>
+          <pre id="output" class="output" aria-live="polite"></pre>
+        </section>
+        <section class="panel">
+          <h2>Functions running <span class="sub">the newest on top</span></h2>
+          <div id="stack" class="stack"></div>
         </section>
       </div>
     </main>

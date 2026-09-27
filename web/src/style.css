@@ -1,72 +1,83 @@
+/* Stepwise's look: cobalt industrial blue, white, safety yellow and black.
+ *
+ * The colours each mean one thing, so a beginner can learn them once:
+ *   cobalt  = something you can do (Run, links, the selected function)
+ *   yellow  = now (the line about to run, what just changed, tips)
+ *   black   = structure (panel edges, headings, text)
+ *   white   = the page
+ * Hard 2px edges and bold small-caps labels, like signage in a workshop:
+ * plain, sturdy, impossible to misread.
+ */
+
 :root {
-  color-scheme: light dark;
-  --bg: #fbfbfa;
-  --panel: #ffffff;
-  --border: #e3e2de;
-  --text: #1f1f1d;
-  --muted: #6b6a66;
-  --accent: #2f6fdb;
-  --error: #c4302b;
-  --syn-keyword: #8a3ab9;
-  --syn-number: #b35c00;
-  --syn-comment: #8a8984;
-  --syn-type: #0f7b6c;
-  --syn-function: #2f5fb3;
-  --syn-operator: #5b5a56;
-  --active-line: rgba(47, 111, 219, 0.06);
-  --step-line: rgba(255, 196, 0, 0.18);
-  --step-range: rgba(255, 196, 0, 0.38);
-  --changed: rgba(47, 111, 219, 0.14);
-  --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+  --cobalt: #0047ab;
+  --cobalt-dark: #00337a;
+  --cobalt-tint: #e6edf8;
+  --yellow: #ffd100;
+  --yellow-soft: #fff4b8;
+  --black: #111111;
+  --white: #ffffff;
+
+  --bg: var(--white);
+  --panel: var(--white);
+  --text: var(--black);
+  --muted: #555555;
+  --edge: var(--black);
+  --hairline: #d6d6d6;
+  --link: var(--cobalt);
+  --topbar: var(--cobalt);
+  --topbar-text: var(--white);
+  --error: #c8102e;
+  --hazard: repeating-linear-gradient(-45deg, var(--yellow) 0 12px, var(--black) 12px 24px);
+
+  --syn-keyword: var(--cobalt);
+  --syn-number: #8a5a00;
+  --syn-comment: #6b6b6b;
+  --syn-type: #2f62b8;
+  --syn-function: var(--black);
+  --syn-operator: #444444;
+  --active-line: rgba(0, 71, 171, 0.05);
+  --step-line: var(--yellow-soft);
+  --step-range: var(--yellow);
+  --step-range-text: var(--black);
+  --changed: var(--yellow-soft);
+  --selected: var(--cobalt-tint);
+
+  --ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+  font-family: var(--ui);
   background: var(--bg);
   color: var(--text);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #181817;
-    --panel: #20201f;
-    --border: #353532;
-    --text: #e8e7e3;
-    --muted: #9b9a95;
-    --accent: #6d9eff;
-    --error: #ff7b72;
-    --syn-keyword: #d2a8ff;
-    --syn-number: #ffa657;
-    --syn-comment: #8b949e;
-    --syn-type: #56d4bc;
-    --syn-function: #79c0ff;
-    --syn-operator: #c9c8c3;
-    --active-line: rgba(109, 158, 255, 0.08);
-    --step-line: rgba(255, 196, 0, 0.12);
-    --step-range: rgba(255, 196, 0, 0.3);
-    --changed: rgba(109, 158, 255, 0.18);
-  }
-}
-
-/* `?theme=dark` (set by src/embed.ts): the dark theme whatever the OS says,
- * so the playground matches wearechintu.com/stepwise around it. The same
- * values as the block above; keep the two in sync. */
+/* `?theme=dark` (src/embed.ts): black instead of white, for the dark page
+ * wearechintu.com frames it in. Same meanings, same yellow. */
 html.theme-dark {
   color-scheme: dark;
-  --bg: #181817;
-  --panel: #20201f;
-  --border: #353532;
-  --text: #e8e7e3;
-  --muted: #9b9a95;
-  --accent: #6d9eff;
-  --error: #ff7b72;
-  --syn-keyword: #d2a8ff;
-  --syn-number: #ffa657;
-  --syn-comment: #8b949e;
-  --syn-type: #56d4bc;
-  --syn-function: #79c0ff;
-  --syn-operator: #c9c8c3;
-  --active-line: rgba(109, 158, 255, 0.08);
-  --step-line: rgba(255, 196, 0, 0.12);
-  --step-range: rgba(255, 196, 0, 0.3);
-  --changed: rgba(109, 158, 255, 0.18);
+  --bg: #0b0b0c;
+  --panel: #111113;
+  --text: #f4f4f4;
+  --muted: #a3a3a3;
+  --edge: #3a3a3f;
+  --hairline: #26262a;
+  --link: #6f9dff;
+  --topbar: #0b0b0c;
+  --topbar-text: #f4f4f4;
+  --error: #ff6b6b;
+  --cobalt-tint: #102a52;
+
+  --syn-keyword: #6f9dff;
+  --syn-number: var(--yellow);
+  --syn-comment: #8a8a8a;
+  --syn-type: #9dbbff;
+  --syn-function: #ffffff;
+  --syn-operator: #c4c4c4;
+  --active-line: rgba(111, 157, 255, 0.06);
+  --step-line: rgba(255, 209, 0, 0.14);
+  --changed: rgba(255, 209, 0, 0.18);
+  --selected: #102a52;
 }
 
 * {
@@ -80,93 +91,533 @@ body {
   flex-direction: column;
 }
 
-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1rem;
-  padding: 0.6rem 1rem;
-  border-bottom: 1px solid var(--border);
+code {
+  font-family: var(--mono);
+  font-size: 0.92em;
 }
 
-h1 {
-  font-size: 1.1rem;
-  margin: 0;
-}
+/* --------------------------------------------------------------- buttons -- */
 
-button {
+button,
+select {
   font: inherit;
-  padding: 0.35rem 0.9rem;
-  border-radius: 6px;
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: white;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--panel);
+  border: 2px solid var(--edge);
+  border-radius: var(--radius);
+  padding: 0.4rem 0.8rem;
   cursor: pointer;
+  max-width: 100%;
+}
+
+button:hover:not(:disabled),
+select:hover {
+  border-color: var(--cobalt);
+}
+
+button:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+.frame:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 2px;
 }
 
 button:disabled {
-  opacity: 0.45;
+  color: var(--muted);
+  border-color: var(--hairline);
   cursor: default;
 }
 
-select {
-  font: inherit;
-  max-width: 100%;
-  padding: 0.3rem 0.5rem;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--text);
+/* The one thing to do first. */
+button.run {
+  background: var(--cobalt);
+  border-color: var(--cobalt);
+  color: var(--white);
+  font-size: 1.05rem;
+  padding: 0.55rem 1.4rem;
 }
 
-button.secondary {
+button.run:hover:not(:disabled) {
+  background: var(--cobalt-dark);
+  border-color: var(--cobalt-dark);
+}
+
+/* The one thing to do next, once it has run. */
+button.next:not(:disabled) {
+  background: var(--yellow);
+  border-color: var(--black);
+  color: var(--black);
+}
+
+button.next:hover:not(:disabled) {
+  box-shadow: 0 0 0 2px var(--black);
+}
+
+button.quiet {
   background: transparent;
-  color: var(--text);
-  border-color: var(--border);
-  padding: 0.35rem 0.6rem;
+  color: var(--topbar-text);
+  border-color: color-mix(in srgb, var(--topbar-text) 55%, transparent);
 }
 
-button.secondary:not(:disabled):hover {
-  border-color: var(--accent);
-}
+/* ---------------------------------------------------------------- topbar -- */
 
-.controls {
+.topbar {
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
   flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  padding: 0.6rem 1rem;
+  background: var(--topbar);
+  color: var(--topbar-text);
+  border-bottom: 2px solid var(--black);
+}
+
+.brand {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+}
+
+.brand a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 3px solid var(--yellow);
+}
+
+.topbar select {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--black);
+}
+
+.share-status {
+  font-size: 0.875rem;
+}
+
+.topbar nav {
+  display: flex;
+  gap: 1.25rem;
+  margin-left: auto;
+}
+
+.topbar nav a {
+  color: var(--topbar-text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.topbar nav a:hover {
+  border-bottom-color: var(--yellow);
+}
+
+/* --------------------------------------------------------------- toolbar -- */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--edge);
+  background: var(--panel);
+}
+
+.stepper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 #timeline {
-  width: 12rem;
-  accent-color: var(--accent);
+  width: 11rem;
+  accent-color: var(--cobalt);
 }
 
-#step-label {
-  color: var(--muted);
-  font-size: 0.9rem;
+.step-label {
+  font-family: var(--mono);
+  font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
-  min-width: 9rem;
+  color: var(--muted);
+  min-width: 8.5rem;
 }
+
+/* "More ways to move": the advanced moves, each explained in words. */
+.more {
+  position: relative;
+}
+
+.more summary {
+  list-style: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 0.4rem 0.8rem;
+  border: 2px solid var(--edge);
+  border-radius: var(--radius);
+  user-select: none;
+}
+
+.more summary::-webkit-details-marker {
+  display: none;
+}
+
+.more summary::after {
+  content: " ▾";
+}
+
+.more[open] summary::after {
+  content: " ▴";
+}
+
+.more .menu {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  width: min(22rem, 90vw);
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  background: var(--panel);
+  border: 2px solid var(--edge);
+  border-radius: var(--radius);
+  box-shadow: 4px 4px 0 var(--black);
+}
+
+.menu button {
+  display: grid;
+  gap: 0.15rem;
+  text-align: left;
+  border-color: var(--hairline);
+}
+
+.menu button span {
+  font-weight: 400;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.menu-hint {
+  margin: 0.2rem 0.2rem 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------ what just happened -- */
+
+.explain {
+  padding: 0.75rem 1rem 0.8rem 1.1rem;
+  border-bottom: 2px solid var(--edge);
+  border-left: 8px solid var(--yellow);
+  background: var(--panel);
+  min-height: 5.5rem;
+}
+
+.explain[data-tone="problem"] {
+  border-left: none;
+  border-top: 8px solid transparent;
+  border-image: var(--hazard) 8 0 0 0 / 8px 0 0 0;
+  padding-left: 1rem;
+}
+
+.explain-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--link);
+}
+
+.explain[data-tone="problem"] .explain-label {
+  color: var(--error);
+}
+
+.explain-lines {
+  margin: 0.3rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+
+.explain-lines li + li {
+  margin-top: 0.1rem;
+}
+
+.explain-lines code,
+.explain-next code,
+.vars-caption code,
+.notice code {
+  background: var(--changed);
+  border-radius: 3px;
+  padding: 0 0.2em;
+}
+
+.explain-next {
+  margin: 0.35rem 0 0;
+  font-weight: 700;
+}
+
+.explain-next::before {
+  content: "→ ";
+  color: var(--link);
+}
+
+.explain-tip {
+  margin: 0.35rem 0 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.explain-tip.attention {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------- the panels -- */
 
 main {
   flex: 1;
   display: grid;
   grid-template-columns: 3fr 2fr;
-  gap: 1px;
-  background: var(--border);
   min-height: 0;
 }
 
 .side {
   display: grid;
-  grid-template-rows: auto minmax(6rem, 1fr) minmax(6rem, 1fr);
-  gap: 1px;
+  grid-template-rows: minmax(7rem, 1fr) minmax(6rem, 1fr) auto;
+  border-left: 2px solid var(--edge);
   min-height: 0;
 }
 
+.panel {
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.side .panel + .panel {
+  border-top: 2px solid var(--edge);
+}
+
+.panel h2 {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.panel h2 .sub {
+  margin-left: 0.4rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.panel h2 .sub code {
+  font-size: 0.95em;
+}
+
+.vars,
+.stack,
+.output {
+  padding: 0.6rem 1rem;
+  overflow: auto;
+}
+
+.output {
+  flex: 1;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.notice {
+  color: var(--muted);
+  font-family: var(--ui);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.error {
+  color: var(--error);
+}
+
+.vars table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 14px;
+}
+
+.vars td {
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.vars td:first-child {
+  color: var(--muted);
+  width: 45%;
+}
+
+.vars td:last-child {
+  font-weight: 700;
+}
+
+.vars tr.changed td {
+  background: var(--changed);
+}
+
+.vars tr.changed td:first-child {
+  color: var(--text);
+  box-shadow: inset 4px 0 0 var(--yellow);
+}
+
+.vars-caption {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.stack {
+  max-height: 11rem;
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+}
+
+.frame {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.35rem 0.6rem;
+  border: 2px solid var(--hairline);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.frame.current {
+  border-color: var(--edge);
+}
+
+.frame.selected {
+  background: var(--selected);
+  border-color: var(--link);
+}
+
+.frame .fn {
+  font-family: var(--mono);
+  font-weight: 700;
+}
+
+.frame .where {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.frame .role {
+  justify-self: end;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.frame.current .role {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- editor -- */
+
+#editor {
+  flex: 1;
+  min-height: 0;
+}
+
+#editor .cm-editor {
+  height: 100%;
+  font-size: 15px;
+}
+
+#editor .cm-editor.cm-focused {
+  outline: none;
+}
+
+#editor .cm-scroller {
+  font-family: var(--mono);
+  line-height: 1.6;
+  /* Show `<=` and `->` as typed, not as ligatures like ≤ and →: beginners
+     need to see which keys to press. */
+  font-variant-ligatures: none;
+  font-feature-settings: "calt" 0, "liga" 0;
+}
+
+#editor .cm-gutters {
+  background: var(--panel);
+  color: var(--muted);
+  border-right: 1px solid var(--hairline);
+}
+
+#editor .cm-activeLine,
+#editor .cm-activeLineGutter {
+  background: var(--active-line);
+}
+
+#editor .cm-content {
+  caret-color: var(--text);
+}
+
+/* The line about to run: yellow, the colour that always means "now". */
+#editor .cm-stepLine {
+  background: var(--step-line);
+  box-shadow: inset 4px 0 0 var(--yellow);
+}
+
+#editor .cm-stepRange,
+#editor .cm-stepRange * {
+  background: var(--step-range);
+  color: var(--step-range-text) !important;
+  border-radius: 2px;
+}
+
+/* Stops ("breakpoints"): click the gutter beside a line number. */
+#editor .cm-breakpoint-gutter .cm-gutterElement {
+  width: 1.2rem;
+  padding-left: 0.25rem;
+  cursor: pointer;
+}
+
+#editor .cm-breakpoint {
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  background: var(--yellow);
+  border: 2px solid var(--black);
+  border-radius: 50%;
+  font-size: 0;
+  vertical-align: middle;
+}
+
+/* ----------------------------------------------------------- small screens -- */
+
 @media (max-width: 800px) {
-  /* Stack everything and let the page scroll. */
   body {
     height: auto;
     min-height: 100vh;
@@ -182,179 +633,84 @@ main {
 
   .side {
     grid-template-rows: auto auto auto;
+    border-left: none;
+    border-top: 2px solid var(--edge);
   }
 
   .vars,
-  pre {
+  .output {
     min-height: 5rem;
   }
 
   #timeline {
     width: 100%;
   }
+
+  .topbar nav {
+    margin-left: 0;
+  }
 }
 
-.panel {
+/* ------------------------------------------ embedded in wearechintu.com -- */
+
+/* The host page has the title and nav. */
+html.embedded .topbar > h1,
+html.embedded .topbar > nav,
+html.embedded body.doc > header {
+  display: none;
+}
+
+html.embedded .topbar {
   background: var(--panel);
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+  color: var(--text);
+  border-bottom: 2px solid var(--edge);
 }
 
-.panel h2 {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--muted);
-  margin: 0;
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid var(--border);
+html.embedded button.quiet {
+  color: var(--text);
+  border-color: var(--edge);
 }
 
-pre {
-  flex: 1;
-  margin: 0;
-  padding: 0.75rem 1rem;
-  font-family: var(--mono);
-  font-size: 14px;
-  line-height: 1.5;
-  overflow: auto;
-}
+/* --------------------------------------- doc pages (language, how it works) -- */
 
-#editor {
-  flex: 1;
-  min-height: 0;
-}
-
-#editor .cm-editor {
-  height: 100%;
-  font-size: 14px;
-}
-
-#editor .cm-editor.cm-focused {
-  outline: none;
-}
-
-#editor .cm-scroller {
-  font-family: var(--mono);
-  line-height: 1.5;
-  /* Show `<=` and `->` as typed, not as ligatures like ≤ and →: beginners
-     need to see which keys to press. */
-  font-variant-ligatures: none;
-  font-feature-settings: "calt" 0, "liga" 0;
-}
-
-#editor .cm-gutters {
-  background: var(--panel);
-  color: var(--muted);
-  border-right: 1px solid var(--border);
-}
-
-#editor .cm-activeLine,
-#editor .cm-activeLineGutter {
-  background: var(--active-line);
-}
-
-#editor .cm-content {
-  caret-color: var(--text);
-}
-
-.error {
-  color: var(--error);
-}
-
-.notice {
-  color: var(--muted);
-  font-style: italic;
-}
-
-.stack,
-.vars {
-  padding: 0.5rem 1rem;
-  overflow: auto;
-  font-family: var(--mono);
-  font-size: 14px;
-}
-
-.stack {
-  max-height: 10rem;
-}
-
-.frame {
-  padding: 0.15rem 0.4rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.frame.selected {
-  background: var(--changed);
-}
-
-.frame .where {
-  color: var(--muted);
-}
-
-.vars table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-.vars td {
-  padding: 0.15rem 0.4rem;
-}
-
-.vars td:first-child {
-  color: var(--muted);
-  width: 40%;
-}
-
-.vars tr.changed td {
-  background: var(--changed);
-}
-
-.vars tr.changed td:last-child {
-  font-weight: 600;
-}
-
-.stack .notice,
-.vars .notice {
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-}
-
-#editor .cm-stepLine {
-  background: var(--step-line);
-}
-
-#editor .cm-stepRange {
-  background: var(--step-range);
-  border-radius: 2px;
-}
-
-nav {
-  display: flex;
-  gap: 1rem;
-  margin-left: auto;
-}
-
-nav a,
-h1 a {
-  color: inherit;
-  text-decoration: none;
-}
-
-nav a {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-nav a:hover {
-  color: var(--accent);
-}
-
-/* Doc pages (language reference, how it works) */
 body.doc {
   height: auto;
   min-height: 100vh;
+}
+
+body.doc > header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  background: var(--topbar);
+  color: var(--topbar-text);
+  border-bottom: 2px solid var(--black);
+}
+
+body.doc > header h1 {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 1.15rem;
+}
+
+body.doc > header h1 a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 3px solid var(--yellow);
+}
+
+body.doc > header nav {
+  display: flex;
+  gap: 1.25rem;
+  margin-left: auto;
+}
+
+body.doc > header nav a {
+  color: var(--topbar-text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
 }
 
 .doc-main {
@@ -366,38 +722,38 @@ body.doc {
 article {
   max-width: 44rem;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.65;
+  font-size: 1.0625rem;
 }
 
 article h1 {
-  font-size: 1.8rem;
+  font-size: 1.9rem;
+  border-bottom: 4px solid var(--yellow);
+  display: inline-block;
 }
 
 article h2 {
-  margin-top: 2rem;
+  margin-top: 2.2rem;
   font-size: 1.25rem;
 }
 
 article code {
-  font-family: var(--mono);
-  font-size: 0.92em;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  background: var(--changed);
+  border-radius: 3px;
   padding: 0.05rem 0.3rem;
 }
 
 article pre {
   background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0.75rem 1rem;
+  border: 2px solid var(--edge);
+  border-radius: var(--radius);
+  padding: 0.8rem 1rem;
+  overflow-x: auto;
   font-variant-ligatures: none;
 }
 
 article pre code {
   background: none;
-  border: none;
   padding: 0;
 }
 
@@ -408,33 +764,15 @@ article table {
 
 article th,
 article td {
-  border: 1px solid var(--border);
-  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--edge);
+  padding: 0.4rem 0.65rem;
   text-align: left;
 }
 
+article th {
+  background: var(--cobalt-tint);
+}
+
 article a {
-  color: var(--accent);
-}
-
-#editor .cm-breakpoint-gutter .cm-gutterElement {
-  width: 1.1rem;
-  padding-left: 0.2rem;
-  cursor: pointer;
-  color: transparent;
-}
-
-#editor .cm-breakpoint-gutter .cm-gutterElement:hover {
-  color: var(--muted);
-}
-
-#editor .cm-breakpoint {
-  color: var(--error);
-}
-
-/* Embedded in wearechintu.com/stepwise: the host page has the title and nav. */
-html.embedded header > h1,
-html.embedded header > nav,
-html.embedded body.doc > header {
-  display: none;
+  color: var(--link);
 }
