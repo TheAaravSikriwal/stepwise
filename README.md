@@ -3,7 +3,8 @@
 Write code in a small teaching language, run it in your browser, and **step backward** through
 every line to see exactly what happened.
 
-> Status: early development (Phase 0 of the MVP). See [STATUS.md](STATUS.md).
+> Status: in development. The playground, debugger UI, example gallery and shareable links work.
+> The compiler stages and the replay engine are being written; see [STATUS.md](STATUS.md).
 
 ## How it works
 
@@ -13,6 +14,9 @@ that recording in either direction. There's no server: everything runs in the br
 
 - [docs/product-plan.md](docs/product-plan.md): what we're building and why
 - [DEVPLAN.md](DEVPLAN.md): how we're building it, who owns what, and the problem playbook
+- [docs/language.md](docs/language.md): the whole language on one page
+- [docs/how-it-works.md](docs/how-it-works.md): record and replay, in plain English
+- [docs/specs/](docs/specs/): the spec for each core piece (lexer, parser, checker, codegen, replay)
 
 ## Layout
 
@@ -33,7 +37,7 @@ cd web
 npm install
 npm run wasm                    # build the compiler to web/pkg
 npm test                        # runtime + end-to-end tests
-npm run dev                     # http://localhost:5173
+npm run dev                     # http://localhost:5173 (add ?demo to preview the debugger)
 ```
 
 Rebuild with `npm run wasm` after changing any Rust code.

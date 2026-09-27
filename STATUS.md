@@ -36,7 +36,8 @@ trap messages, and worker protocol.
   6. **Replay engine** (independent of the compiler, so do it whenever): `docs/specs/replay.md`,
      then `cd web && npx vitest run tests/replay` (18 correctness + 4 speed tests).
   7. When a piece passes, move its step in `.github/workflows/ci.yml` up into the required tests.
-- **My track:** the one-page language reference and the "How it works" page. (Shareable links and the example gallery are done.)
+- **My track:** the plumbing for MVP and 1.0 is essentially done (gallery, sharing, language reference, How it works). Next: deployment (GitHub Pages, which needs your OK), the social preview image, and issue templates.
+- **Note:** `docs/how-it-works.md` describes undo plus snapshots. Update it once you choose your replay design.
 
 Every test file has been checked against a throwaway reference implementation (outside the
 repo, deleted afterwards), so if a test fails, the bug is in the code under test, not the test.

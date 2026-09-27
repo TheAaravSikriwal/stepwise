@@ -4,7 +4,16 @@ export default defineConfig({
   // Relative asset paths so the site works from any subpath (e.g. GitHub Pages).
   base: "./",
   worker: { format: "es" },
-  // The example gallery is loaded from ../docs/examples.
+  build: {
+    rollupOptions: {
+      input: {
+        main: "index.html",
+        language: "language.html",
+        howItWorks: "how-it-works.html",
+      },
+    },
+  },
+  // The example gallery and doc pages are loaded from ../docs.
   server: { fs: { allow: [".."] } },
   test: {
     include: ["tests/**/*.test.ts"],
