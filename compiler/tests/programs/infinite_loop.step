@@ -1,0 +1,7 @@
+// expect-trap: stopped after
+fn main() {
+    let mut i = 0;
+    while true {
+        i = i + 1;
+    }
+}

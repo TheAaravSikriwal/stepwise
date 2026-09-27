@@ -1,0 +1,8 @@
+// expect: 1
+// expect-trap: divide by zero
+fn main() {
+    let zero = 0;
+    print(1);
+    print(10 / zero);
+    print(2);
+}

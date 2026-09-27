@@ -1,0 +1,19 @@
+// expect: 1
+// expect: false
+// expect: 3
+// expect: true
+// expect: 5
+// expect: 6
+// expect: false
+fn noisy(value: bool, label: int) -> bool {
+    print(label);
+    return value;
+}
+
+fn main() {
+    // `&&` skips the right side when the left side is false.
+    print(noisy(false, 1) && noisy(true, 2));
+    // `||` skips the right side when the left side is true.
+    print(noisy(true, 3) || noisy(false, 4));
+    print(noisy(true, 5) && noisy(false, 6));
+}

@@ -13,7 +13,7 @@ it("reports the panic message through the hook", () => {
   const wasmPath = fileURLToPath(new URL("../pkg/stepwise_wasm_bg.wasm", import.meta.url));
   compilerModule.initSync({ module: readFileSync(wasmPath) });
 
-  expect(() => compilerModule.compile("__stepwise_test_panic__")).toThrow();
+  expect(() => compilerModule.test_panic()).toThrow();
   expect(reported).toMatch(/test panic requested/);
-  expect(reported).toMatch(/stub\.rs:\d+/); // includes where it happened
+  expect(reported).toMatch(/lib\.rs:\d+/); // includes where it happened
 });

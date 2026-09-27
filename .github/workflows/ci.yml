@@ -29,6 +29,9 @@ jobs:
       - name: "In progress: checker"
         run: cargo test -p stepwise-compiler --test checker
         continue-on-error: true
+      - name: "In progress: codegen"
+        run: cargo test -p stepwise-compiler --test codegen
+        continue-on-error: true
 
   web:
     runs-on: ubuntu-latest

@@ -28,7 +28,7 @@ describe("phase 0 pipeline", () => {
   });
 
   it("stops cleanly at the event limit", async () => {
-    const compiled = compileWith(compilerModule, "");
+    const compiled = compileWith(compilerModule, "fn main() { print(42); }");
     const { trace, outcome } = await run(compiled.wasm!, 3);
     expect(outcome).toEqual({ kind: "limit", limit: 3 });
     expect(trace.length).toBe(3);

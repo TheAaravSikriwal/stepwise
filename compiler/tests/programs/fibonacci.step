@@ -1,0 +1,25 @@
+// expect: 0
+// expect: 1
+// expect: 1
+// expect: 2
+// expect: 3
+// expect: 5
+// expect: 8
+// expect: 13
+// expect: 21
+// expect: 34
+// expect: 55
+fn fib(n: int) -> int {
+    if n < 2 {
+        return n;
+    }
+    return fib(n - 1) + fib(n - 2);
+}
+
+fn main() {
+    let mut i = 0;
+    while i <= 10 {
+        print(fib(i));
+        i = i + 1;
+    }
+}

@@ -1,0 +1,12 @@
+// expect: 0
+// expect: 1
+// expect: 4
+fn main() {
+    let mut i = 0;
+    while i < 3 {
+        // A new `square` is declared on every pass through the loop.
+        let square = i * i;
+        print(square);
+        i = i + 1;
+    }
+}

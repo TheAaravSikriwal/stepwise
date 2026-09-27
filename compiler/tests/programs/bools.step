@@ -1,0 +1,18 @@
+// expect: 10
+// expect: 20
+// expect: true
+fn pick(flag: bool, a: int, b: int) -> int {
+    if flag {
+        return a;
+    }
+    return b;
+}
+
+fn main() {
+    let yes = 1 < 2;
+    print(pick(yes, 10, 20));
+    print(pick(!yes, 10, 20));
+    let mut flag = false;
+    flag = !flag;
+    print(flag);
+}

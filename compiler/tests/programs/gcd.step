@@ -1,0 +1,19 @@
+// expect: 6
+// expect: 1
+// expect: 9
+fn gcd(a: int, b: int) -> int {
+    let mut x = a;
+    let mut y = b;
+    while y != 0 {
+        let t = y;
+        y = x % y;
+        x = t;
+    }
+    return x;
+}
+
+fn main() {
+    print(gcd(48, 18));
+    print(gcd(17, 5));
+    print(gcd(0, 9));
+}

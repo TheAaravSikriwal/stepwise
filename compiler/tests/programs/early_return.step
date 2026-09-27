@@ -1,0 +1,17 @@
+// expect: 21
+// expect: 10
+fn first_multiple(of: int, above: int) -> int {
+    let mut n = above + 1;
+    while true {
+        if n % of == 0 {
+            return n;
+        }
+        n = n + 1;
+    }
+    return -1;
+}
+
+fn main() {
+    print(first_multiple(7, 20));
+    print(first_multiple(5, 5));
+}

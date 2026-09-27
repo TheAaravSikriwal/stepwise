@@ -1,0 +1,12 @@
+// expect: 10
+// expect: 15
+// expect: true
+fn main() {
+    let x = 5;
+    let mut y = x * 2;
+    print(y);
+    y = y + x;
+    print(y);
+    let big: bool = y > 12;
+    print(big);
+}

@@ -1,0 +1,12 @@
+// expect: 1
+// expect: 2
+fn loud() -> int {
+    print(1);
+    return 5;
+}
+
+fn main() {
+    // The result is thrown away (codegen must `drop` it).
+    loud();
+    print(2);
+}

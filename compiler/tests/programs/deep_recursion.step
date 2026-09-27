@@ -1,0 +1,8 @@
+// expect-trap: stack
+fn down(n: int) -> int {
+    return down(n + 1);
+}
+
+fn main() {
+    print(down(0));
+}

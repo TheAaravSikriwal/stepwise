@@ -1,0 +1,24 @@
+// expect: 3
+// expect: 2
+// expect: 12
+// expect: 3
+// expect: 1
+// expect: -3
+// expect: -1
+// expect: -7
+// expect: -2147483648
+// expect: -2147483648
+fn main() {
+    print(1 + 2);
+    print(10 - 4 * 2);
+    print((10 - 4) * 2);
+    print(7 / 2);
+    print(7 % 3);
+    // Division truncates toward zero.
+    print(-7 / 2);
+    print(-7 % 2);
+    print(-(3 + 4));
+    // Overflow wraps around.
+    print(2147483647 + 1);
+    print(-2147483648);
+}

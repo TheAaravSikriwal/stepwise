@@ -1,0 +1,22 @@
+// expect: 7
+// expect: 7
+// expect: 2
+// expect: 1
+// expect: 0
+fn show_twice(n: int) {
+    print(n);
+    print(n);
+}
+
+fn countdown(n: int) {
+    if n < 0 {
+        return;
+    }
+    print(n);
+    countdown(n - 1);
+}
+
+fn main() {
+    show_twice(7);
+    countdown(2);
+}

@@ -24,8 +24,12 @@ trap messages, and worker protocol.
      change is fine but tell me.
   3. **Checker:** `docs/specs/checker.md`, then `cargo test --test checker` (58 tests). The output
      types in `compiler/src/checked.rs` are a shared draft.
-  4. When a piece passes, move its step in `.github/workflows/ci.yml` up into the required tests.
-- **My track:** Step 3 prep: the codegen spec, the golden-program harness (programs with expected output, run natively under wasmtime), and the instrumentation tests.
+  4. **Codegen:** `docs/specs/codegen.md`, then `cargo test --test codegen` (7 exact traces, the
+     steps table, and 22 golden programs in `compiler/tests/programs/`).
+  5. After each stage passes, bump `PIPELINE` in `compiler/src/lib.rs` (Lexer → Parser → Checker →
+     Codegen), run `npm run wasm` in `web/`, and try broken programs in the playground.
+  6. When a piece passes, move its step in `.github/workflows/ci.yml` up into the required tests.
+- **My track:** Step 5 prep: the debugger UI (variables, call stack, output synced to steps, step controls) built against a fake replay engine, plus the replay engine spec and property tests.
 
 Every test file has been checked against a throwaway reference implementation (outside the
 repo, deleted afterwards), so if a test fails, the bug is in the code under test, not the test.
