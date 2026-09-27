@@ -8,6 +8,7 @@
 pub mod abi;
 pub mod debug_table;
 pub mod diagnostic;
+pub mod lexer;
 pub mod span;
 mod stub;
 

@@ -1,0 +1,16 @@
+fn factorial(n: int) -> int {
+    if n <= 1 {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+fn main() {
+    let mut total = 0;
+    let mut i = 1;
+    while i <= 5 {
+        total = total + factorial(i);
+        i = i + 1;
+    }
+    print(total);
+}

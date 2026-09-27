@@ -1038,6 +1038,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
 
 [[package]]
+name = "stepc"
+version = "0.1.0"
+dependencies = [
+ "stepwise-compiler",
+ "wasmprinter 0.259.0",
+]
+
+[[package]]
 name = "stepwise-compiler"
 version = "0.1.0"
 dependencies = [
@@ -1358,6 +1366,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "wasmprinter"
+version = "0.259.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0510ce2ff0ad7c5510ad3dfcb2cedba4cf5d9f7e08d1d06e4d8cf8e5638aef95"
+dependencies = [
+ "anyhow",
+ "termcolor",
+ "wasmparser 0.259.0",
+]
+
+[[package]]
 name = "wasmtime"
 version = "49.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1435,7 +1454,7 @@ dependencies = [
  "target-lexicon",
  "wasm-encoder 0.258.0",
  "wasmparser 0.258.0",
- "wasmprinter",
+ "wasmprinter 0.258.0",
  "wasmtime-internal-component-util",
  "wasmtime-internal-core",
 ]
