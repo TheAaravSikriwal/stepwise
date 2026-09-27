@@ -22,9 +22,10 @@ trap messages, and worker protocol.
   2. **Parser:** `docs/specs/parser.md`, then `cargo test --test parser --test parser_depth`
      (44 + 3 tests). Review the draft AST in `compiler/src/ast.rs` first; it's shared, so any
      change is fine but tell me.
-  3. When a piece passes, move its step in `.github/workflows/ci.yml` up into the required tests.
-- **My track:** Step 2 prep, which is the resolver and type-checker spec and error-message tests.
-  After that, the golden-program harness for codegen (Step 3).
+  3. **Checker:** `docs/specs/checker.md`, then `cargo test --test checker` (58 tests). The output
+     types in `compiler/src/checked.rs` are a shared draft.
+  4. When a piece passes, move its step in `.github/workflows/ci.yml` up into the required tests.
+- **My track:** Step 3 prep: the codegen spec, the golden-program harness (programs with expected output, run natively under wasmtime), and the instrumentation tests.
 
 Every test file has been checked against a throwaway reference implementation (outside the
 repo, deleted afterwards), so if a test fails, the bug is in the code under test, not the test.

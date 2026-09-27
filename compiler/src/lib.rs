@@ -7,6 +7,8 @@
 
 pub mod abi;
 pub mod ast;
+pub mod checked;
+pub mod checker;
 pub mod debug_table;
 pub mod diagnostic;
 pub mod lexer;

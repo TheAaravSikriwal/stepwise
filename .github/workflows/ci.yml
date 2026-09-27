@@ -26,6 +26,9 @@ jobs:
       - name: "In progress: parser"
         run: cargo test -p stepwise-compiler --test parser --test parser_depth
         continue-on-error: true
+      - name: "In progress: checker"
+        run: cargo test -p stepwise-compiler --test checker
+        continue-on-error: true
 
   web:
     runs-on: ubuntu-latest
