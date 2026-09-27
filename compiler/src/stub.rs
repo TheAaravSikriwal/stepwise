@@ -18,7 +18,12 @@ use wasm_encoder::{
     Module, TypeSection,
 };
 
-pub(crate) fn compile(_source: &str) -> CompileOutput {
+pub(crate) fn compile(source: &str) -> CompileOutput {
+    // Lets tests check that compiler panics are reported with their message.
+    if source.contains("__stepwise_test_panic__") {
+        panic!("test panic requested");
+    }
+
     let mut types = TypeSection::new();
     let mut imports = ImportSection::new();
     abi::emit_imports(&mut types, &mut imports);

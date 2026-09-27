@@ -30,6 +30,21 @@ impl CompileResult {
 }
 
 #[wasm_bindgen]
+extern "C" {
+    /// Set by the worker before loading the compiler. Receives the message of
+    /// a compiler panic, since a panic otherwise surfaces in JS only as an
+    /// opaque `unreachable` trap.
+    #[wasm_bindgen(js_namespace = globalThis, js_name = __stepwisePanic)]
+    fn report_panic(message: &str);
+}
+
+/// Runs automatically when the module is loaded.
+#[wasm_bindgen(start)]
+fn start() {
+    std::panic::set_hook(Box::new(|info| report_panic(&info.to_string())));
+}
+
+#[wasm_bindgen]
 pub fn compile(source: &str) -> CompileResult {
     let source = normalize_newlines(source);
     let out = stepwise_compiler::compile(&source);

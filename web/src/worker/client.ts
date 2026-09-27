@@ -28,6 +28,8 @@ export class Runner {
         if (this.pending?.id !== data.id) return;
         window.clearTimeout(this.pending.timer);
         this.pending = null;
+        // The worker may be in a bad state (e.g. after a compiler panic).
+        if (data.type === "internal-error") this.restart();
         resolve(data);
       };
       this.worker.postMessage({ type: "run", id, source } satisfies Request);

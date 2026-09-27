@@ -7,6 +7,13 @@
   --muted: #6b6a66;
   --accent: #2f6fdb;
   --error: #c4302b;
+  --syn-keyword: #8a3ab9;
+  --syn-number: #b35c00;
+  --syn-comment: #8a8984;
+  --syn-type: #0f7b6c;
+  --syn-function: #2f5fb3;
+  --syn-operator: #5b5a56;
+  --active-line: rgba(47, 111, 219, 0.06);
   --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   background: var(--bg);
@@ -22,6 +29,13 @@
     --muted: #9b9a95;
     --accent: #6d9eff;
     --error: #ff7b72;
+    --syn-keyword: #d2a8ff;
+    --syn-number: #ffa657;
+    --syn-comment: #8b949e;
+    --syn-type: #56d4bc;
+    --syn-function: #79c0ff;
+    --syn-operator: #c9c8c3;
+    --active-line: rgba(109, 158, 255, 0.08);
   }
 }
 
@@ -97,7 +111,6 @@ main {
   border-bottom: 1px solid var(--border);
 }
 
-textarea,
 pre {
   flex: 1;
   margin: 0;
@@ -108,13 +121,42 @@ pre {
   overflow: auto;
 }
 
-textarea {
-  border: none;
-  resize: none;
+#editor {
+  flex: 1;
+  min-height: 0;
+}
+
+#editor .cm-editor {
+  height: 100%;
+  font-size: 14px;
+}
+
+#editor .cm-editor.cm-focused {
   outline: none;
-  background: transparent;
-  color: inherit;
-  tab-size: 4;
+}
+
+#editor .cm-scroller {
+  font-family: var(--mono);
+  line-height: 1.5;
+  /* Show `<=` and `->` as typed, not as ligatures like ≤ and →: beginners
+     need to see which keys to press. */
+  font-variant-ligatures: none;
+  font-feature-settings: "calt" 0, "liga" 0;
+}
+
+#editor .cm-gutters {
+  background: var(--panel);
+  color: var(--muted);
+  border-right: 1px solid var(--border);
+}
+
+#editor .cm-activeLine,
+#editor .cm-activeLineGutter {
+  background: var(--active-line);
+}
+
+#editor .cm-content {
+  caret-color: var(--text);
 }
 
 .error {

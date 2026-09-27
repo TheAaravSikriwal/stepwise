@@ -1,21 +1,33 @@
-// Phase 0 page: a plain textarea and an output panel. The CodeMirror editor
-// and debugger panels replace this in later phases.
+// The playground page: editor, Run button, output panel. The debugger panels
+// arrive in Phase 5.
 
+import { createEditor } from "./editor/editor";
 import { describeOutcome } from "./runtime/run";
 import { outputOf } from "./runtime/trace";
 import { Runner } from "./worker/client";
 
-const EXAMPLE = `fn main() {
-    print(42);
+const EXAMPLE = `fn factorial(n: int) -> int {
+    if n <= 1 {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+fn main() {
+    let mut total = 0;
+    let mut i = 1;
+    while i <= 5 {
+        total = total + factorial(i);
+        i = i + 1;
+    }
+    print(total);
 }
 `;
 
-const source = document.querySelector<HTMLTextAreaElement>("#source")!;
 const output = document.querySelector<HTMLPreElement>("#output")!;
 const runButton = document.querySelector<HTMLButtonElement>("#run")!;
 const runner = new Runner();
-
-source.value = EXAMPLE;
+const editor = createEditor(document.querySelector("#editor")!, EXAMPLE, runProgram);
 
 function line(text: string, className?: string): HTMLElement {
   const el = document.createElement("div");
@@ -27,14 +39,16 @@ function line(text: string, className?: string): HTMLElement {
 async function runProgram(): Promise<void> {
   runButton.disabled = true;
   try {
-    const res = await runner.run(source.value);
+    const res = await runner.run(editor.source());
     if (res.type === "internal-error" && res.message === "cancelled") return;
     output.replaceChildren();
     switch (res.type) {
       case "compile-error":
+        editor.showDiagnostics(res.meta.diagnostics);
         for (const d of res.meta.diagnostics) output.append(line(d.rendered, "error"));
         break;
       case "ran": {
+        editor.showDiagnostics(res.meta.diagnostics); // warnings, if any
         for (const text of outputOf(res.trace)) output.append(line(text));
         const problem = describeOutcome(res.outcome);
         if (problem) output.append(line(problem, "error"));
@@ -43,6 +57,7 @@ async function runProgram(): Promise<void> {
         break;
       }
       case "internal-error":
+        editor.showDiagnostics([]);
         output.append(line(res.message, "error"));
         break;
     }
@@ -52,9 +67,6 @@ async function runProgram(): Promise<void> {
 }
 
 runButton.addEventListener("click", runProgram);
-source.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-    e.preventDefault();
-    runProgram();
-  }
-});
+
+// Dev-only handle for poking at the page from the browser console.
+if (import.meta.env.DEV) Object.assign(window, { __stepwise: { editor, runner, runProgram } });

@@ -11,6 +11,13 @@ import type { Request, Response } from "./protocol";
 const scope = self as unknown as {
   onmessage: ((e: MessageEvent<Request>) => void) | null;
   postMessage(message: Response, transfer?: Transferable[]): void;
+  __stepwisePanic?: (message: string) => void;
+};
+
+// The compiler's panic hook calls this (see compiler-wasm/src/lib.rs).
+let panicMessage: string | null = null;
+scope.__stepwisePanic = (message) => {
+  panicMessage = message;
 };
 
 const ready = init();
@@ -26,6 +33,11 @@ scope.onmessage = async ({ data: req }) => {
     const { trace, outcome } = await run(wasm);
     scope.postMessage({ type: "ran", id: req.id, meta, trace, outcome }, transferables(trace));
   } catch (e) {
-    scope.postMessage({ type: "internal-error", id: req.id, message: String(e) });
+    const message = panicMessage
+      ? `The compiler crashed. This is a bug in Stepwise, not in your program.\n\n${panicMessage}`
+      : `Something went wrong inside Stepwise: ${e}`;
+    // After a panic the compiler's memory may be inconsistent, so the page
+    // replaces this worker when it gets an internal error.
+    scope.postMessage({ type: "internal-error", id: req.id, message });
   }
 };
