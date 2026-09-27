@@ -16,6 +16,8 @@ const $ = <T extends HTMLElement>(sel: string) => document.querySelector<T>(sel)
 const params = new URLSearchParams(location.search);
 // `?demo` previews the debugger with a canned session (no compiler or replay needed).
 const demo = params.has("demo");
+// `?embed`: shown inside wearechintu.com/stepwise, which supplies the title and navigation.
+if (params.has("embed")) document.documentElement.classList.add("embedded");
 const DEFAULT_EXAMPLE = "factorial";
 
 /** What to show on load: a shared program, `?example=<id>`, or the default example. */

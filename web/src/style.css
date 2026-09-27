@@ -407,3 +407,9 @@ article a {
 #editor .cm-breakpoint {
   color: var(--error);
 }
+
+/* Embedded in wearechintu.com/stepwise: the host page has the title and nav. */
+html.embedded header > h1,
+html.embedded header > nav {
+  display: none;
+}
