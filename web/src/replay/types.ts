@@ -17,6 +17,12 @@ export interface ReplayState {
 }
 
 export interface FrameView {
+  /**
+   * Different for every call, even of the same function at the same depth
+   * (`f(1) + f(2)` makes two), so a frame can be told apart from a new one
+   * that took its place.
+   */
+  callId: number;
   fnId: number;
   /** Function name, from the debug table. */
   name: string;

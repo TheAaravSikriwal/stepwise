@@ -71,8 +71,9 @@ describe("narrate: calls, returns, prints and errors", () => {
     steps: [at("return a + b;"), at("print(add(2, 3));")],
   };
   const ctx = { debug, source, lineOf: lineOf(source) };
-  const main = (line: number | null) => ({ fnId: 1, name: "main", line, vars: [] });
+  const main = (line: number | null) => ({ callId: 0, fnId: 1, name: "main", line, vars: [] });
   const add = {
+    callId: 2,
     fnId: 0,
     name: "add",
     line: 0,
@@ -102,7 +103,7 @@ describe("narrate: calls, returns, prints and errors", () => {
   it("says a function finished, and what was printed", () => {
     const n = narrate(inAdd, done, ctx);
     expect(n.happened).toEqual([
-      "`add` finished and handed its answer back to `main`.",
+      "`add` finished and went back to `main`.",
       "Printed 5.",
       "The program finished.",
     ]);
@@ -111,5 +112,15 @@ describe("narrate: calls, returns, prints and errors", () => {
   it("explains a runtime error at the end", () => {
     const n = narrate(inAdd, state({ step: 2, frames: [] }), ctx, "Division by zero.");
     expect(n.happened.at(-1)).toBe("The program stopped: Division by zero.");
+  });
+
+  it("tells a new call apart from the one it replaced, at the same depth", () => {
+    // `add(1, 1) + add(2, 3)`: one call finishes and the next starts within a
+    // single step, both at depth 2. That's a return and a call, not `a`
+    // and `b` changing.
+    const first = { ...add, callId: 2, vars: [{ varId: 0, name: "a", value: 1, display: "1" }, { varId: 1, name: "b", value: 1, display: "1" }] };
+    const second = { ...add, callId: 9 };
+    const n = narrate(state({ line: 0, frames: [main(1), first] }), state({ line: 0, frames: [main(1), second] }), ctx);
+    expect(n.happened).toEqual(["`add` finished and went back to `main`.", "Called `add` with a = 2, b = 3."]);
   });
 });

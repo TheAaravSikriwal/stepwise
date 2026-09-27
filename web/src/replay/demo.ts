@@ -66,7 +66,7 @@ function stateAt(step: number): ReplayState {
   return {
     step,
     line,
-    frames: line === null ? [] : [{ fnId: 0, name: "main", line, vars }],
+    frames: line === null ? [] : [{ callId: 0, fnId: 0, name: "main", line, vars }],
     output: [],
     changed: new Set(changed),
   };

@@ -33,10 +33,11 @@ export function narrate(
   if (prev === null) {
     happened.push("Your program is ready to start. Nothing has run yet.");
   } else {
-    happened.push(...returns(prev, cur));
-    happened.push(...variableChanges(prev, cur));
+    const shared = sharedFrames(prev, cur);
+    happened.push(...returns(prev, shared));
+    happened.push(...variableChanges(prev, cur, shared));
     for (const text of cur.output.slice(prev.output.length)) happened.push(`Printed ${text}.`);
-    happened.push(...calls(prev, cur));
+    happened.push(...calls(cur, shared));
     const checked = condition(prev, cur, ctx);
     if (checked) happened.unshift(checked);
     if (happened.length === 0 && prev.line !== null) {
@@ -57,22 +58,46 @@ function lineOfStep(step: number, ctx: NarrationContext): number {
   return span ? ctx.lineOf(span.from) : 0;
 }
 
-/** Functions that finished during the step, innermost first. */
-function returns(prev: ReplayState, cur: ReplayState): string[] {
-  const out: string[] = [];
-  for (let i = prev.frames.length - 1; i >= cur.frames.length; i--) {
-    const done = prev.frames[i].name;
-    const caller = prev.frames[i - 1]?.name;
-    // `main` finishing is the program finishing, which is said at the end.
-    if (caller) out.push(`${code(done)} finished and handed its answer back to ${code(caller)}.`);
-  }
-  return out;
+/**
+ * How many frames, from `main` inward, are the same calls before and after
+ * the step. Frames past that point finished (in `prev`) or started (in
+ * `cur`). Comparing by call rather than by depth matters: in
+ * `f(1) + f(2)` one call to `f` can finish and another start in one step,
+ * at the same depth.
+ */
+function sharedFrames(prev: ReplayState, cur: ReplayState): number {
+  let n = 0;
+  while (n < prev.frames.length && n < cur.frames.length && prev.frames[n].callId === cur.frames[n].callId) n++;
+  return n;
+}
+
+const list = (names: string[]) =>
+  names.length <= 1 ? names.join("") : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+
+/**
+ * Functions that finished during the step, as one sentence. Several can
+ * finish at once (a recursion unwinding), so they're summarised rather than
+ * listed one by one.
+ */
+function returns(prev: ReplayState, shared: number): string[] {
+  // Innermost first. `main` finishing is the program finishing, which is
+  // said at the end, so it's left out.
+  const finished = prev.frames
+    .slice(Math.max(shared, 1))
+    .map((f) => f.name)
+    .reverse();
+  if (finished.length === 0) return [];
+  const backIn = prev.frames[shared - 1]?.name ?? prev.frames[0].name;
+  const names = [...new Set(finished)].map(code);
+  if (finished.length === 1) return [`${names[0]} finished and went back to ${code(backIn)}.`];
+  const whose = names.length === 1 ? "its" : "their";
+  return [`${list(names)} finished all ${finished.length} of ${whose} calls, one after another, and went back to ${code(backIn)}.`];
 }
 
 /** Functions that started during the step, outermost first. */
-function calls(prev: ReplayState, cur: ReplayState): string[] {
+function calls(cur: ReplayState, shared: number): string[] {
   const out: string[] = [];
-  for (let i = Math.max(prev.frames.length, 1); i < cur.frames.length; i++) {
+  for (let i = Math.max(shared, 1); i < cur.frames.length; i++) {
     const f = cur.frames[i];
     const args = f.vars.map((v) => `${v.name} = ${v.display}`).join(", ");
     out.push(args ? `Called ${code(f.name)} with ${args}.` : `Called ${code(f.name)}.`);
@@ -80,10 +105,9 @@ function calls(prev: ReplayState, cur: ReplayState): string[] {
   return out;
 }
 
-/** New, changed and vanished variables in the frames that exist before and after. */
-function variableChanges(prev: ReplayState, cur: ReplayState): string[] {
+/** New, changed and vanished variables in the calls that were running before and after. */
+function variableChanges(prev: ReplayState, cur: ReplayState, shared: number): string[] {
   const out: string[] = [];
-  const shared = Math.min(prev.frames.length, cur.frames.length);
   for (let i = 0; i < shared; i++) {
     const before = byId(prev.frames[i]);
     const after = byId(cur.frames[i]);
@@ -94,11 +118,10 @@ function variableChanges(prev: ReplayState, cur: ReplayState): string[] {
     }
     const gone = prev.frames[i].vars.filter((v) => !after.has(v.varId)).map((v) => code(v.name));
     if (gone.length === 1) out.push(`${gone[0]} went away, because the block it was made in ended.`);
-    if (gone.length > 1) out.push(`${gone.join(", ")} went away, because the block they were made in ended.`);
+    if (gone.length > 1) out.push(`${list(gone)} went away, because the block they were made in ended.`);
   }
   return out;
 }
-
 function byId(frame: FrameView) {
   return new Map(frame.vars.map((v) => [v.varId, v]));
 }
@@ -113,7 +136,8 @@ function condition(prev: ReplayState, cur: ReplayState, ctx: NarrationContext): 
   if (prev.line === null) return null;
   // A call inside the condition means we don't know its value yet. (At the
   // very end, `main` returning in the same step is fine: the check was false.)
-  if (prev.frames.length !== cur.frames.length && cur.line !== null) return null;
+  const sameCall = sharedFrames(prev, cur) === prev.frames.length && prev.frames.length === cur.frames.length;
+  if (!sameCall && cur.line !== null) return null;
   const cond = ctx.debug.steps[prev.line];
   if (!cond) return null;
   const text = ctx.source.slice(cond.from, cond.to);

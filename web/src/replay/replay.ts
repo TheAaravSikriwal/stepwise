@@ -29,6 +29,8 @@ interface Var {
 }
 
 interface Frame {
+  /** Index of this call's `call` event: unique per call. */
+  callId: number;
   fnId: number;
   /** span_id of the last `line` event in this frame, or null. */
   line: number | null;
@@ -46,7 +48,7 @@ interface Snapshot {
 }
 
 const copyFrames = (frames: Frame[]): Frame[] =>
-  frames.map((f) => ({ fnId: f.fnId, line: f.line, vars: f.vars.map((v) => ({ ...v })) }));
+  frames.map((f) => ({ callId: f.callId, fnId: f.fnId, line: f.line, vars: f.vars.map((v) => ({ ...v })) }));
 
 export function createReplay(trace: TraceData, debug: DebugTable): Replay {
   const { lines } = trace;
@@ -73,7 +75,7 @@ export function createReplay(trace: TraceData, debug: DebugTable): Replay {
     const top = frames[frames.length - 1];
     switch (trace.kind[i]) {
       case Kind.Call:
-        frames.push({ fnId: a, line: null, vars: [] });
+        frames.push({ callId: i, fnId: a, line: null, vars: [] });
         break;
       case Kind.Line:
         if (top) top.line = a;
@@ -158,6 +160,7 @@ export function createReplay(trace: TraceData, debug: DebugTable): Replay {
 
   function frameView(f: Frame): FrameView {
     return {
+      callId: f.callId,
       fnId: f.fnId,
       name: debug.functions[f.fnId]?.name ?? `function ${f.fnId}`,
       line: f.line,
