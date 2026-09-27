@@ -45,6 +45,30 @@
   }
 }
 
+/* `?theme=dark` (set by src/embed.ts): the dark theme whatever the OS says,
+ * so the playground matches wearechintu.com/stepwise around it. The same
+ * values as the block above; keep the two in sync. */
+html.theme-dark {
+  color-scheme: dark;
+  --bg: #181817;
+  --panel: #20201f;
+  --border: #353532;
+  --text: #e8e7e3;
+  --muted: #9b9a95;
+  --accent: #6d9eff;
+  --error: #ff7b72;
+  --syn-keyword: #d2a8ff;
+  --syn-number: #ffa657;
+  --syn-comment: #8b949e;
+  --syn-type: #56d4bc;
+  --syn-function: #79c0ff;
+  --syn-operator: #c9c8c3;
+  --active-line: rgba(109, 158, 255, 0.08);
+  --step-line: rgba(255, 196, 0, 0.12);
+  --step-range: rgba(255, 196, 0, 0.3);
+  --changed: rgba(109, 158, 255, 0.18);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -410,6 +434,7 @@ article a {
 
 /* Embedded in wearechintu.com/stepwise: the host page has the title and nav. */
 html.embedded header > h1,
-html.embedded header > nav {
+html.embedded header > nav,
+html.embedded body.doc > header {
   display: none;
 }
