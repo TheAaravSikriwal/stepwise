@@ -1,0 +1,4 @@
+fn main() {
+    let x = 3;
+    let ok = 1 < x < 5;
+}

@@ -32,6 +32,9 @@ jobs:
       - name: "In progress: codegen"
         run: cargo test -p stepwise-compiler --test codegen --test examples
         continue-on-error: true
+      - name: "In progress: error message snapshots"
+        run: cargo test -p stepwise-compiler --test error_messages
+        continue-on-error: true
 
   web:
     runs-on: ubuntu-latest

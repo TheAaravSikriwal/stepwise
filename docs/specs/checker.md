@@ -156,3 +156,5 @@ than 2 characters.
 - [ ] No cascading errors (the `cascade_*` tests)
 - [ ] Error messages read well for a beginner. Try some in the playground once it's wired up
 - [ ] You can explain why there are two passes, and why the error type prevents cascades
+- [ ] Run `cargo test --test error_messages`, then `cargo insta review`: read all 15 messages in
+      `compiler/tests/errors/` as a beginner would before accepting them

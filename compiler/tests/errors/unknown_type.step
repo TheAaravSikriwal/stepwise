@@ -1,0 +1,7 @@
+fn double(n: integer) -> integer {
+    return n * 2;
+}
+
+fn main() {
+    print(double(2));
+}
