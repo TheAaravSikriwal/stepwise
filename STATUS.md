@@ -17,16 +17,21 @@ trap messages, and worker protocol.
 
 ## Next
 
-- **My track:** Step 1a. Lexer spec (`docs/specs/lexer.md`), token types, failing lexer tests,
-  and the `stepc` dev CLI. Then 1b, the CodeMirror editor.
-- **Your track:** read *Crafting Interpreters*, chapter 4 ("Scanning"), then the lexer spec once
-  it's written.
+- **Your track:** the lexer. Read `docs/specs/lexer.md`, then make `cargo test --test lexer` pass
+  (29 tests, currently failing at `todo!()` as intended). *Crafting Interpreters*, chapter 4, is
+  the background reading. When they pass, move the lexer step in `.github/workflows/ci.yml` up
+  into the required tests.
+- **My track:** Step 1b, the CodeMirror editor: syntax highlighting, error underlines,
+  Ctrl+Enter to run.
 
-## Open issues
+## Environment notes
 
-- **Smart App Control is blocking Rust builds.** It intermittently blocks `rustc` from loading
-  proc-macro DLLs it just built (Code Integrity event 3077), and blocks `cargo-fmt.exe` entirely.
-  `cargo clippy` fails every time; `cargo test` sometimes does. Waiting on your decision about how
-  to handle it.
-- No GitHub remote yet. Creating it and deploying are public actions, so ask first.
+- Smart App Control was blocking rustc's proc-macro DLLs. Turned off on 2026-09-27; fmt, clippy
+  and tests all work now.
+- GitHub: https://github.com/TheAaravSikriwal/stepwise (public). Git has no credential helper
+  configured, so pushes use `git -c credential.helper= -c "credential.helper=!gh auth git-credential" push`,
+  or run `gh auth setup-git` once to make plain `git push` work.
+
+## Open questions
+
 - No LICENSE yet (the plan suggests MIT; needs your name as the copyright holder).

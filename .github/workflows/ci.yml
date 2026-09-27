@@ -15,7 +15,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo fmt --all --check
       - run: cargo clippy --workspace --all-targets -- -D warnings
-      - run: cargo test --workspace --lib --bins --doc
+      - run: cargo test --workspace --lib --bins
+      - run: cargo test --workspace --doc
       - run: cargo test -p stepwise-compiler --test phase0
       # Core pieces still being written: run and report, but don't fail CI.
       # Move each line up (dropping continue-on-error) once its tests pass.
