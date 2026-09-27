@@ -1,6 +1,6 @@
 // The playground page: editor, Run, and the debugger panels.
 
-import "./embed";
+import { embedded } from "./embed";
 import { createEditor } from "./editor/editor";
 import { EXAMPLES } from "./examples";
 import { DEMO_DEBUG, DEMO_SOURCE, createDemoReplay, createDemoStepIndex } from "./replay/demo";
@@ -118,13 +118,31 @@ examples.addEventListener("change", () => {
   editor.showDiagnostics([]);
 });
 
+/**
+ * Framed at wearechintu.com/stepwise, a shared link should open that page
+ * (which hands the hash back to this frame), not the bare app. The host
+ * page is on the same origin there, so its address is readable; from any
+ * other host it isn't, and the link points at this page instead.
+ */
+function hostPage(): Location | null {
+  if (!embedded || window.parent === window) return null;
+  try {
+    return window.parent.location.href ? window.parent.location : null;
+  } catch {
+    return null;
+  }
+}
+
 // Share: put the program in the URL and copy it
 const shareStatus = $("#share-status");
 $<HTMLButtonElement>("#share").addEventListener("click", async () => {
-  const url = new URL(location.href);
+  const hash = await encodeProgram(editor.source());
+  const host = hostPage();
+  const url = new URL(host ? host.href : location.href);
   url.search = "";
-  url.hash = await encodeProgram(editor.source());
-  history.replaceState(null, "", url);
+  url.hash = hash;
+  if (host) host.replace(url.href);
+  else history.replaceState(null, "", url);
   try {
     await navigator.clipboard.writeText(url.href);
     shareStatus.textContent = "Link copied";

@@ -41,29 +41,41 @@ required tests. When you're stuck, ask for a hint level (DEVPLAN.md §7.2).
 Every test suite was checked against a throwaway reference implementation (kept outside the repo,
 and deleted), so a failing test means a bug in the code under test, not in the test.
 
-## Going live on wearechintu.com (once the MVP works)
+## Releasing through wearechintu.com
 
-Decided 2026-09-27: Stepwise becomes the third line on the wearechintu.com portfolio,
-"Stepwise: a debugger that runs in reverse". The app is served from **stepwise.wearechintu.com**
-and framed at **wearechintu.com/stepwise**. Nothing is published until the compiler and replay
-engine pass their tests.
+Decided 2026-09-27: Stepwise ships **as part of the wearechintu.com site**, the same way the site
+itself is released (Vercel: every pushed branch gets a preview, and merging to `main` publishes).
+It's the third line on the portfolio, "Stepwise: a debugger that runs in reverse". The built
+playground is copied into the site at `public/stepwise-app/` and framed at
+**wearechintu.com/stepwise**. Nothing is published until the compiler and replay engine pass
+their tests, and until you've tried it on a preview.
 
 Already done:
-- This repo: `deploy.yml` (GitHub Pages, manual-only for now, runs the web tests first),
-  `web/public/CNAME`, and `?embed&theme=dark` for the framed view.
-- The site: commit `6f59ff2` on the local branch **`stepwise`**, in the worktree
-  `D:\VisualStudioProjects\gitbuddywebsite-stepwise`. Not pushed. It adds the portfolio line, a
-  Stepwise side (header, transition, dark page) and `/stepwise` with the framed playground. The
-  site's 413 tests pass, and its build passes apart from `/api/bundles`, which needs the Supabase
-  keys that only Vercel has.
+- **This repo:** `npm run export-site -- <site checkout>` (in `web/`). It builds the compiler,
+  runs every Rust and web test, builds the site, and copies it with a `VERSION` stamp. Also the
+  `?embed&theme=dark` framed view, and Share links that point at the host page when framed.
+- **The site:** the local branch **`stepwise`** in the worktree
+  `D:\VisualStudioProjects\gitbuddywebsite-stepwise`. Not pushed. It has the portfolio line, a
+  Stepwise side (header, transition, dark page), `/stepwise` with the framed playground, and a
+  separate security policy for `/stepwise-app/` that allows WebAssembly and same-site framing
+  (every other page keeps the strict one). The site's 413 tests pass; its build passes apart from
+  `/api/bundles`, which needs the Supabase keys that only Vercel has.
+- **Tested locally** (2026-09-27) with a real export: the framed app compiles and runs programs
+  under the new policy, `/stepwise` itself still can't run wasm or be framed, and Share links
+  round-trip through `/stepwise#code=…`.
 
-To go live, in order:
-1. Stepwise repo: Settings → Pages → Source: **GitHub Actions**, then run **Deploy site** from the
-   Actions tab.
-2. DNS (Cloudflare): `CNAME stepwise → theaaravsikriwal.github.io`, DNS only (grey cloud), so
-   GitHub can issue the HTTPS certificate.
-3. Check https://stepwise.wearechintu.com, then add `push: branches: [main]` to `deploy.yml`.
-4. Site: push the `stepwise` branch for a Vercel preview, try it, then merge into `main`.
+To release (once the MVP passes its tests):
+1. **Test the app on its own:** `npm run dev` in `web/` and try the gallery, some broken programs,
+   and stepping back and forth.
+2. **Export into the site:** `npm run export-site -- D:\VisualStudioProjects\gitbuddywebsite-stepwise`
+   (without `STEPWISE_SKIP_TESTS`, so the tests run).
+3. **Test inside the site locally:** `npm run dev` in the site worktree, then open
+   http://localhost:3000/stepwise.
+4. **Commit** `public/stepwise-app/` on the site's `stepwise` branch and **push it**. Vercel builds a
+   preview URL, and you test there: that's the real production setup.
+5. **Merge to `main`** when you're happy. That publishes it.
+
+For later updates, repeat steps 2–5 (export, test, commit, preview, merge).
 
 ## My track
 

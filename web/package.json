@@ -9,6 +9,7 @@
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
     "preview": "vite preview",
+    "export-site": "node scripts/export-to-site.mjs",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
