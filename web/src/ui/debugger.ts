@@ -55,7 +55,7 @@ const TIPS = [
   "Tip: the yellow line is the one about to run. Nothing on it has happened yet.",
   "Tip: variables highlighted in yellow were just made or changed.",
   "Tip: drag the slider to move through the whole run at once.",
-  "Tip: click just left of a line number to put a stop there. Then use More ways to move.",
+  "Tip: click just left of a line number to put a stop there. Then use More moves to jump to it.",
 ];
 
 export class Debugger {

@@ -224,8 +224,8 @@ button.quiet {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem 1.25rem;
-  padding: 0.75rem 1rem;
+  gap: 0.6rem 1rem;
+  padding: 0.65rem 1rem;
   border-bottom: 2px solid var(--edge);
   background: var(--panel);
 }
@@ -238,7 +238,7 @@ button.quiet {
 }
 
 #timeline {
-  width: 11rem;
+  width: 9rem;
   accent-color: var(--cobalt);
 }
 
@@ -247,7 +247,7 @@ button.quiet {
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
-  min-width: 8.5rem;
+  min-width: 6.5rem;
 }
 
 /* "More ways to move": the advanced moves, each explained in words. */
@@ -661,6 +661,7 @@ html.embedded body.doc > header {
 }
 
 html.embedded .topbar {
+  padding-block: 0.4rem;
   background: var(--panel);
   color: var(--text);
   border-bottom: 2px solid var(--edge);
