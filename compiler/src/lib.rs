@@ -6,9 +6,11 @@
 //! and tested end to end.
 
 pub mod abi;
+pub mod ast;
 pub mod debug_table;
 pub mod diagnostic;
 pub mod lexer;
+pub mod parser;
 pub mod span;
 mod stub;
 

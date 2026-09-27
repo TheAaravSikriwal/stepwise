@@ -2,17 +2,18 @@
 //!
 //! ```text
 //! stepc tokens <file>   the lexer's tokens, one per line
+//! stepc ast    <file>   the parse tree as an S-expression
 //! stepc check  <file>   compile and print diagnostics
 //! stepc wat    <file>   the compiled module as WebAssembly text
 //! ```
 //!
-//! More commands (`ast`, `run`) arrive with the stages they show.
+//! More commands (`run`) arrive with the stages they show.
 
 use std::process::ExitCode;
 use stepwise_compiler::span::LineIndex;
-use stepwise_compiler::{Diagnostic, compile, lexer, normalize_newlines};
+use stepwise_compiler::{Diagnostic, compile, lexer, normalize_newlines, parser};
 
-const USAGE: &str = "usage: stepc <tokens|check|wat> <file.step>";
+const USAGE: &str = "usage: stepc <tokens|ast|check|wat> <file.step>";
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -45,6 +46,11 @@ fn main() -> ExitCode {
                     format!("{:?}", t.kind)
                 );
             }
+            report(&diags, &source, &file_name)
+        }
+        "ast" => {
+            let (program, diags) = parser::parse(&source);
+            println!("{}", program.to_sexpr());
             report(&diags, &source, &file_name)
         }
         "check" => {

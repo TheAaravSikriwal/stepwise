@@ -17,12 +17,17 @@ trap messages, and worker protocol.
 
 ## Next
 
-- **Your track:** the lexer. Read `docs/specs/lexer.md`, then make `cargo test --test lexer` pass
-  (29 tests, currently failing at `todo!()` as intended). *Crafting Interpreters*, chapter 4, is
-  the background reading. When they pass, move the lexer step in `.github/workflows/ci.yml` up
-  into the required tests.
-- **My track:** Step 1b, the CodeMirror editor: syntax highlighting, error underlines,
-  Ctrl+Enter to run.
+- **Your track, in order:**
+  1. **Lexer:** `docs/specs/lexer.md`, then make `cargo test --test lexer` pass (29 tests).
+  2. **Parser:** `docs/specs/parser.md`, then `cargo test --test parser --test parser_depth`
+     (44 + 3 tests). Review the draft AST in `compiler/src/ast.rs` first; it's shared, so any
+     change is fine but tell me.
+  3. When a piece passes, move its step in `.github/workflows/ci.yml` up into the required tests.
+- **My track:** Step 2 prep, which is the resolver and type-checker spec and error-message tests.
+  After that, the golden-program harness for codegen (Step 3).
+
+Every test file has been checked against a throwaway reference implementation (outside the
+repo, deleted afterwards), so if a test fails, the bug is in the code under test, not the test.
 
 ## Environment notes
 
