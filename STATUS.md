@@ -41,12 +41,35 @@ required tests. When you're stuck, ask for a hint level (DEVPLAN.md §7.2).
 Every test suite was checked against a throwaway reference implementation (kept outside the repo,
 and deleted), so a failing test means a bug in the code under test, not in the test.
 
+## Going live on wearechintu.com (once the MVP works)
+
+Decided 2026-09-27: Stepwise becomes the third line on the wearechintu.com portfolio,
+"Stepwise: a debugger that runs in reverse". The app is served from **stepwise.wearechintu.com**
+and framed at **wearechintu.com/stepwise**. Nothing is published until the compiler and replay
+engine pass their tests.
+
+Already done:
+- This repo: `deploy.yml` (GitHub Pages, manual-only for now, runs the web tests first),
+  `web/public/CNAME`, and `?embed&theme=dark` for the framed view.
+- The site: commit `6f59ff2` on the local branch **`stepwise`**, in the worktree
+  `D:\VisualStudioProjects\gitbuddywebsite-stepwise`. Not pushed. It adds the portfolio line, a
+  Stepwise side (header, transition, dark page) and `/stepwise` with the framed playground. The
+  site's 413 tests pass, and its build passes apart from `/api/bundles`, which needs the Supabase
+  keys that only Vercel has.
+
+To go live, in order:
+1. Stepwise repo: Settings → Pages → Source: **GitHub Actions**, then run **Deploy site** from the
+   Actions tab.
+2. DNS (Cloudflare): `CNAME stepwise → theaaravsikriwal.github.io`, DNS only (grey cloud), so
+   GitHub can issue the HTTPS certificate.
+3. Check https://stepwise.wearechintu.com, then add `push: branches: [main]` to `deploy.yml`.
+4. Site: push the `stepwise` branch for a Vercel preview, try it, then merge into `main`.
+
 ## My track
 
 Waiting on your decisions:
-- **Deployment:** GitHub Pages from CI on every push to `main`.
 - **LICENSE:** MIT, which needs the name to put on it.
-- **Social preview image:** after deployment, since it needs the final URL.
+- **Social preview image:** after going live, since it needs the final URL.
 
 Later: arrays and strings (v1.0) touch every stage, so they wait until the MVP works.
 
