@@ -78,6 +78,8 @@ export function createDemoReplay(): Replay {
     stepCount: rows.length,
     seek: (k) => void (step = Math.max(0, Math.min(rows.length - 1, Math.trunc(k)))),
     state: () => stateAt(step),
+    // The demo is canned states, not a trace, so it can't trace values back.
+    origin: () => null,
   };
 }
 

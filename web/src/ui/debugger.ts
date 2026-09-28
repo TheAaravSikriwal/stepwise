@@ -6,7 +6,7 @@
 //
 // Talks to the program only through the `Replay` interface.
 
-import type { DebugTable } from "../compiler";
+import type { DebugTable, Range } from "../compiler";
 import type { Editor } from "../editor/editor";
 import { type Replay, type ReplayState, varKey } from "../replay/types";
 import { narrate } from "./narrate";
@@ -66,6 +66,8 @@ export class Debugger {
   private previous: ReplayState | null = null;
   /** Index into `frames` of the frame whose variables are shown. */
   private selectedFrame = 0;
+  /** Set by "where from?" until the next move: which value, and the line that set it. */
+  private origin: { name: string; value: string; span: Range | null; passedBy: string | null } | null = null;
 
   constructor(
     private readonly el: Elements,
@@ -229,9 +231,34 @@ export class Debugger {
     if (this.session && this.current) this.seek(target(this.session.index, this.current.step));
   }
 
-  seek(step: number): void {
+  /**
+   * "Where from?": jumps to the moment a variable got its current value,
+   * marks the line that set it in blue, and says so in the explainer.
+   */
+  whereFrom(frameIndex: number, varId: number): void {
+    const s = this.session;
+    const frame = this.current?.frames[frameIndex];
+    const v = frame?.vars.find((x) => x.varId === varId);
+    if (!s || !frame || !v) return;
+    const found = s.replay.origin(frame.callId, varId);
+    if (!found) {
+      this.flashTip(`Couldn't find where \`${v.name}\` got its value.`);
+      return;
+    }
+    s.replay.seek(found.statement);
+    const at = s.replay.state();
+    // If the variable's call didn't exist yet at that statement, the
+    // statement was the call that passed it in: a parameter.
+    const passedBy = at.frames.length <= frameIndex ? frame.name : null;
+    const span = at.line === null ? null : (s.debug.steps[at.line] ?? null);
+    this.origin = { name: v.name, value: v.display, span, passedBy };
+    this.seek(found.after, true);
+  }
+
+  seek(step: number, keepOrigin = false): void {
     const s = this.session;
     if (!s) return;
+    if (!keepOrigin) this.origin = null;
     const k = Math.max(0, Math.min(Math.trunc(step) || 0, s.replay.stepCount - 1));
     // The step before, so the explainer can say what changed.
     this.previous = null;
@@ -261,11 +288,27 @@ export class Debugger {
     this.el.forward.disabled = this.el.toEnd.disabled = this.el.nextBreak.disabled = atEnd;
 
     this.editor.showStep(st.line === null ? null : (s.debug.steps[st.line] ?? null));
+    this.editor.showOrigin(this.origin?.span ?? null);
     this.renderStack(st, s.debug);
     this.renderVars(st);
     this.renderOutput(st.output, s.endMessage, atEnd);
 
     const n = narrate(this.previous, st, { debug: s.debug, source: s.source, lineOf: this.editor.lineOf }, s.endMessage);
+    if (this.origin) {
+      const { name, value, span, passedBy } = this.origin;
+      const where = span ? `Line ${this.editor.lineOf(span.from)}` : "This step";
+      const how = passedBy
+        ? `called \`${passedBy}\` and passed in \`${name}\` = ${value}`
+        : `gave \`${name}\` its value, ${value}`;
+      this.explain({
+        tone: "step",
+        label: `Where \`${name}\` came from`,
+        lines: [`${where} ${how}. It's marked in blue.`, ...n.happened],
+        next: n.next,
+        tip: "Press Next step or Back to carry on from here.",
+      });
+      return;
+    }
     this.explain({
       tone: atEnd ? (s.endMessage ? "problem" : "done") : st.step === 0 ? "start" : "step",
       label: atEnd ? (s.endMessage ? "The program stopped" : "Finished") : st.step === 0 ? "Ready" : "What just happened",
@@ -280,7 +323,7 @@ export class Debugger {
   private explain(e: Explanation): void {
     const box = this.el.explain;
     box.dataset.tone = e.tone;
-    const label = el("div", "explain-label", e.label);
+    const label = rich("div", e.label, "explain-label");
     const list = document.createElement("ul");
     list.className = "explain-lines";
     for (const line of e.lines) list.append(rich("li", line));
@@ -385,6 +428,14 @@ export class Debugger {
       }
       row.insertCell().textContent = v.name;
       row.insertCell().textContent = v.display;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "where-from";
+      button.textContent = "where from?";
+      button.title = `Jump to the line that gave ${v.name} this value`;
+      const frameIndex = this.selectedFrame;
+      button.addEventListener("click", () => this.whereFrom(frameIndex, v.varId));
+      row.insertCell().append(button);
     }
     nodes.push(table);
     this.el.vars.replaceChildren(...nodes);

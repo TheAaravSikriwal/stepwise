@@ -51,6 +51,21 @@ export interface Replay {
   seek(step: number): void;
   /** The state at the current step. */
   state(): ReplayState;
+  /**
+   * Where the value a variable has right now came from: the step whose
+   * statement last set it (a `let`, an assignment, or the call that passed
+   * a parameter), and the step just after, when the new value is visible.
+   * `callId` says which call's copy of the variable (recursion has several).
+   * `null` if it was never set in that call before the current step.
+   */
+  origin(callId: number, varId: number): Origin | null;
+}
+
+export interface Origin {
+  /** The step about to run the statement that set the value. */
+  statement: number;
+  /** The step right after it, where the value has its new value. */
+  after: number;
 }
 
 export function varKey(frameIndex: number, varId: number): string {

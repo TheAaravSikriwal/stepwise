@@ -29,6 +29,8 @@ export interface Editor {
   showDiagnostics(diags: Diagnostic[]): void;
   /** Highlights the debugger's current step (and scrolls to it), or clears it with `null`. */
   showStep(range: Range | null): void;
+  /** Marks the line a value came from (and scrolls to it), or clears it with `null`. */
+  showOrigin(range: Range | null): void;
   /** 1-based line number of an offset. */
   lineOf(offset: number): number;
   /** Called after every edit. */
@@ -37,30 +39,40 @@ export interface Editor {
   breakpoints(): Set<number>;
 }
 
-const setStep = StateEffect.define<Range | null>();
-
-const stepHighlight = StateField.define<DecorationSet>({
-  create: () => Decoration.none,
-  update(deco, tr) {
-    deco = deco.map(tr.changes);
-    for (const effect of tr.effects) {
-      if (!effect.is(setStep)) continue;
-      if (!effect.value) {
-        deco = Decoration.none;
-        continue;
+/**
+ * A highlight of one range and its line, set by an effect and cleared with
+ * `null`. Two of them: the step about to run (yellow), and the line a value
+ * came from (blue).
+ */
+function rangeHighlight(lineClass: string, rangeClass: string) {
+  const set = StateEffect.define<Range | null>();
+  const field = StateField.define<DecorationSet>({
+    create: () => Decoration.none,
+    update(deco, tr) {
+      deco = deco.map(tr.changes);
+      for (const effect of tr.effects) {
+        if (!effect.is(set)) continue;
+        if (!effect.value) {
+          deco = Decoration.none;
+          continue;
+        }
+        const len = tr.state.doc.length;
+        const from = Math.min(effect.value.from, len);
+        const to = Math.min(Math.max(effect.value.to, from), len);
+        const line = tr.state.doc.lineAt(from);
+        const ranges = [Decoration.line({ class: lineClass }).range(line.from)];
+        if (to > from) ranges.push(Decoration.mark({ class: rangeClass }).range(from, to));
+        deco = Decoration.set(ranges, true);
       }
-      const len = tr.state.doc.length;
-      const from = Math.min(effect.value.from, len);
-      const to = Math.min(Math.max(effect.value.to, from), len);
-      const line = tr.state.doc.lineAt(from);
-      const ranges = [Decoration.line({ class: "cm-stepLine" }).range(line.from)];
-      if (to > from) ranges.push(Decoration.mark({ class: "cm-stepRange" }).range(from, to));
-      deco = Decoration.set(ranges, true);
-    }
-    return deco;
-  },
-  provide: (field) => EditorView.decorations.from(field),
-});
+      return deco;
+    },
+    provide: (f) => EditorView.decorations.from(f),
+  });
+  return { set, field };
+}
+
+const stepHighlight = rangeHighlight("cm-stepLine", "cm-stepRange");
+const originHighlight = rangeHighlight("cm-originLine", "cm-originRange");
 
 // Breakpoints: click the gutter next to a line number (or press F9) to toggle.
 const toggleBreakpointAt = StateEffect.define<number>({ map: (pos, mapping) => mapping.mapPos(pos) });
@@ -127,7 +139,8 @@ export function createEditor(parent: HTMLElement, doc: string, onRun: () => void
         EditorState.tabSize.of(4),
         breakpoints,
         lintGutter(),
-        stepHighlight,
+        stepHighlight.field,
+        originHighlight.field,
         keymap.of([runKey, ...defaultKeymap, ...historyKeymap, indentWithTab]),
         stepwise,
         EditorView.contentAttributes.of({ "aria-label": "Program source", spellcheck: "false" }),
@@ -148,7 +161,15 @@ export function createEditor(parent: HTMLElement, doc: string, onRun: () => void
       view.dispatch(setDiagnostics(view.state, toLint(diags, view.state.doc.length)));
     },
     showStep(range) {
-      const effects: StateEffect<unknown>[] = [setStep.of(range)];
+      const effects: StateEffect<unknown>[] = [stepHighlight.set.of(range)];
+      if (range) {
+        const pos = Math.min(range.from, view.state.doc.length);
+        effects.push(EditorView.scrollIntoView(pos, { y: "nearest" }));
+      }
+      view.dispatch({ effects });
+    },
+    showOrigin(range) {
+      const effects: StateEffect<unknown>[] = [originHighlight.set.of(range)];
       if (range) {
         const pos = Math.min(range.from, view.state.doc.length);
         effects.push(EditorView.scrollIntoView(pos, { y: "nearest" }));

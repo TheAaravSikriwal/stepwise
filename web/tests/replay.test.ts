@@ -154,3 +154,41 @@ describe("the key property: a step's state doesn't depend on how you got there",
     expect(show(s3)).toEqual(before);
   });
 });
+
+describe("where a value came from", () => {
+  // loop: step 3 is `let sq`, step 6 is `i = i + 1` (its second pass), main's callId is 0.
+  it("finds the assignment that gave a variable its current value", () => {
+    const r = fresh(loop);
+    r.seek(7); // i = 2
+    expect(r.origin(0, 0)).toEqual({ statement: 6, after: 7 });
+  });
+
+  it("finds a variable made fresh inside a loop", () => {
+    const r = fresh(loop);
+    r.seek(6); // sq = 1, made on the second pass
+    expect(r.origin(0, 1)).toEqual({ statement: 5, after: 6 });
+  });
+
+  it("uses the value as of the current step, not the end of the run", () => {
+    const r = fresh(loop);
+    r.seek(2); // i = 0, from `let mut i = 0` in step 0
+    expect(r.origin(0, 0)).toEqual({ statement: 0, after: 1 });
+  });
+
+  it("tells recursive copies apart, and finds where a parameter was passed", () => {
+    // recursion: fact(3), fact(2), fact(1) have callIds 2, 6 and 10.
+    const r = fresh(recursion);
+    r.seek(6); // inside fact(1)
+    // fact(1)'s n came from fact(2)'s `return n * fact(n - 1)` (step 4) ...
+    expect(r.origin(10, 0)).toEqual({ statement: 4, after: 5 });
+    // ... and fact(2)'s n from fact(3)'s (step 2).
+    expect(r.origin(6, 0)).toEqual({ statement: 2, after: 3 });
+  });
+
+  it("says when there's nothing to find", () => {
+    const r = fresh(recursion);
+    r.seek(2);
+    expect(r.origin(0, 1)).toBeNull(); // main's `ok` doesn't exist yet
+    expect(r.origin(99, 0)).toBeNull(); // no such call
+  });
+});

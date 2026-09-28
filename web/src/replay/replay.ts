@@ -19,7 +19,7 @@
 
 import type { DebugTable } from "../compiler";
 import { Kind, type TraceData, printed } from "../runtime/trace";
-import { type FrameView, type Replay, type ReplayState, varKey } from "./types";
+import { type FrameView, type Origin, type Replay, type ReplayState, varKey } from "./types";
 
 const SNAPSHOT_EVERY = 1000;
 
@@ -58,6 +58,22 @@ export function createReplay(trace: TraceData, debug: DebugTable): Replay {
   const output: string[] = [];
   for (let i = 0; i < trace.length; i++) {
     if (trace.kind[i] === Kind.Print) output.push(printed(trace, i));
+  }
+
+  /**
+   * Which call each event happened in: the index of that call's `call`
+   * event (which is also its `callId`), or -1 outside any call. Used to find
+   * where a value came from without mixing up recursive copies.
+   */
+  const owner = new Int32Array(trace.length);
+  {
+    const open: number[] = [];
+    for (let i = 0; i < trace.length; i++) {
+      const kind = trace.kind[i];
+      if (kind === Kind.Call) open.push(i);
+      owner[i] = open.length ? open[open.length - 1] : -1;
+      if (kind === Kind.Ret) open.pop();
+    }
   }
 
   /** How many events step k has applied: through its `line` event, or all of them at the end. */
@@ -176,9 +192,38 @@ export function createReplay(trace: TraceData, debug: DebugTable): Replay {
     };
   }
 
+  /** The step whose statement contains event i: the last `line` event before it. */
+  function stepOfEvent(i: number): number {
+    let lo = 0;
+    let hi = lines.length - 1;
+    let found = 0;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (lines[mid] < i) {
+        found = mid;
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
+    }
+    return found;
+  }
+
+  function origin(callId: number, varId: number): Origin | null {
+    for (let i = eventsThrough(step) - 1; i >= 0; i--) {
+      const kind = trace.kind[i];
+      if ((kind === Kind.Declare || kind === Kind.Assign) && trace.a[i] === varId && owner[i] === callId) {
+        const statement = stepOfEvent(i);
+        return { statement, after: Math.min(statement + 1, stepCount - 1) };
+      }
+    }
+    return null;
+  }
+
   return {
     stepCount,
     seek,
+    origin,
     state(): ReplayState {
       return {
         step,
