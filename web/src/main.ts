@@ -3,6 +3,7 @@
 import { currentTheme, embedded, forcedTheme, setTheme } from "./embed";
 import { createEditor } from "./editor/editor";
 import { EXAMPLES } from "./examples";
+import { GalaxyPanel } from "./galaxy/panel";
 import { DEMO_DEBUG, DEMO_SOURCE, createDemoReplay, createDemoStepIndex } from "./replay/demo";
 import { createReplay } from "./replay/replay";
 import { describeOutcome } from "./runtime/run";
@@ -52,6 +53,16 @@ const debug = new Debugger(
   editor,
 );
 
+const galaxy = new GalaxyPanel(
+  {
+    codeTab: $<HTMLButtonElement>("#tab-code"),
+    galaxyTab: $<HTMLButtonElement>("#tab-galaxy"),
+    code: $("#editor"),
+    galaxy: $("#galaxy"),
+  },
+  debug,
+);
+
 // A recording only matches the code it came from.
 editor.onChange(() => {
   if (debug.active) debug.codeChanged();
@@ -97,7 +108,7 @@ async function runProgram(): Promise<void> {
         try {
           const replay = createReplay(res.trace, res.meta.debug);
           const index = StepIndex.fromTrace(res.trace, res.meta.debug, editor.lineOf);
-          debug.load({ replay, debug: res.meta.debug, source, index, endMessage });
+          debug.load({ replay, debug: res.meta.debug, source, index, endMessage, trace: res.trace });
         } catch (e) {
           // No replay engine yet (or it crashed): still show the output.
           debug.showOutputOnly(outputOf(res.trace), endMessage, (e as Error).message);
@@ -197,4 +208,4 @@ $<HTMLButtonElement>("#share").addEventListener("click", async () => {
 });
 
 // Dev-only handle for poking at the page from the browser console.
-if (import.meta.env.DEV) Object.assign(window, { __stepwise: { editor, runner, debug, runProgram } });
+if (import.meta.env.DEV) Object.assign(window, { __stepwise: { editor, runner, debug, galaxy, runProgram } });

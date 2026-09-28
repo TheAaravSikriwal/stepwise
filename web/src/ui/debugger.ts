@@ -9,6 +9,7 @@
 import type { DebugTable, Range } from "../compiler";
 import type { Editor } from "../editor/editor";
 import { type Replay, type ReplayState, varKey } from "../replay/types";
+import type { TraceData } from "../runtime/trace";
 import { narrate } from "./narrate";
 import type { StepIndex } from "./steps";
 
@@ -21,6 +22,8 @@ export interface Session {
   index: StepIndex;
   /** Shown at the final step, e.g. a runtime error or the step-limit message. */
   endMessage: string | null;
+  /** The recording, for the call galaxy. The demo has none. */
+  trace?: TraceData;
 }
 
 interface Elements {
@@ -68,6 +71,7 @@ export class Debugger {
   private selectedFrame = 0;
   /** Set by "where from?" until the next move: which value, and the line that set it. */
   private origin: { name: string; value: string; span: Range | null; passedBy: string | null } | null = null;
+  private listeners: ((session: Session | null, state: ReplayState | null) => void)[] = [];
 
   constructor(
     private readonly el: Elements,
@@ -85,6 +89,11 @@ export class Debugger {
     el.timeline.addEventListener("input", () => this.seek(Number(el.timeline.value)));
     document.addEventListener("keydown", (e) => this.onKey(e));
     this.idle();
+  }
+
+  /** Called after every move with the new state, and with nulls when debugging stops. */
+  onStep(listener: (session: Session | null, state: ReplayState | null) => void): void {
+    this.listeners.push(listener);
   }
 
   get active(): boolean {
@@ -201,6 +210,7 @@ export class Debugger {
     this.setEnabled(false);
     this.el.stepLabel.textContent = "";
     this.el.timeline.value = "0";
+    for (const l of this.listeners) l(null, null);
   }
 
   step(delta: number): void {
@@ -292,6 +302,7 @@ export class Debugger {
     this.renderStack(st, s.debug);
     this.renderVars(st);
     this.renderOutput(st.output, s.endMessage, atEnd);
+    for (const l of this.listeners) l(s, st);
 
     const n = narrate(this.previous, st, { debug: s.debug, source: s.source, lineOf: this.editor.lineOf }, s.endMessage);
     if (this.origin) {

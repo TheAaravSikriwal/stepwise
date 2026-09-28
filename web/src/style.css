@@ -646,6 +646,122 @@ main {
   font-weight: 600;
 }
 
+/* ------------------------------------------- "Your code" | "Call galaxy" -- */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0.45rem 0.6rem 0.35rem;
+}
+
+.tabs button {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.3rem 0.85rem;
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+
+.tabs button[aria-selected="true"] {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.galaxy {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.galaxy[hidden] {
+  display: none;
+}
+
+.galaxy-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 0 0.6rem;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%),
+    var(--panel-2);
+}
+
+.galaxy-stage canvas,
+.galaxy-labels {
+  position: absolute;
+  inset: 0;
+}
+
+.galaxy-labels {
+  cursor: grab;
+  touch-action: none;
+}
+
+.galaxy-labels:active {
+  cursor: grabbing;
+}
+
+.galaxy-label {
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 1px 8px;
+  border-radius: var(--pill);
+  background: color-mix(in srgb, var(--panel) 80%, transparent);
+  border: 1px solid var(--border);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.galaxy-label.now {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: var(--on-yellow);
+  font-weight: 600;
+}
+
+.galaxy-tooltip {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  max-width: 18rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-pop);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.galaxy-notice {
+  margin: 0;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.galaxy-legend {
+  padding: 0.5rem 1rem 0.7rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.galaxy-legend p {
+  margin: 0;
+}
+
+.galaxy-legend:empty {
+  display: none;
+}
+
 /* ---------------------------------------------------------------- editor -- */
 
 #editor {

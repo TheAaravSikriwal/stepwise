@@ -4,7 +4,8 @@ Write code in a small teaching language, run it in your browser, and **step back
 every line to see exactly what happened.
 
 > Status: the MVP works end to end: write a program, run it, and step through it in both directions,
-> with every step explained in plain English. See [STATUS.md](STATUS.md).
+> with every step explained in plain English. Ask any variable "where did this value come from?",
+> or open the call galaxy to see the whole run as a 3D map. See [STATUS.md](STATUS.md).
 
 ## How it works
 

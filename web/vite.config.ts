@@ -5,6 +5,9 @@ export default defineConfig({
   base: "./",
   worker: { format: "es" },
   build: {
+    // The call galaxy's chunk is mostly three.js (~570 kB). It only loads
+    // when the galaxy tab opens, so it doesn't slow the playground down.
+    chunkSizeWarningLimit: 650,
     rollupOptions: {
       input: {
         main: "index.html",

@@ -13,8 +13,8 @@ backwards, with a plain-English explanation of every step.
   errors (division by zero, recursion that never stops).
 - **Replay engine:** snapshots every 1,000 steps; any seek, in either direction, loads the nearest
   snapshot and replays forward. Fast on a million-event run.
-- **Playground:** cobalt, white, safety yellow and black. A "What just happened" explainer for
-  every step, variables with change highlights, functions running, output synced to the step,
+- **Playground:** the Electric look (dark and light), code coloured by kind. A "What just
+  happened" explainer for every step, "where from?" on every variable, the 3D call galaxy, variables with change highlights, functions running, output synced to the step,
   step / skip over / finish function / stops in both directions, a timeline, the example gallery,
   share links, and the language and "How it works" pages.
 
@@ -22,13 +22,19 @@ backwards, with a plain-English explanation of every step.
 - Rust (`cargo test --workspace`): lexer 29, parser 47, checker 58, error messages 15, codegen
   (7 exact traces and 23 golden programs, including the "tour" program), the 10 gallery examples,
   and trace-consistency checks on every run.
-- Web (`npm test` in `web/`): 74 tests, including the replay engine (18 correctness, 4 speed), the
-  explainer, step navigation, share links, and all 23 golden programs again in the browser runtime.
+- Web (`npm test` in `web/`): 90 tests, including the replay engine (18 correctness, 4 speed, 5
+  "where from?"), the call galaxy's tree and layout (8), the explainer, step navigation, the
+  highlighter, share links, and all 23 golden programs again in the browser runtime.
 
 **Checked by hand in the browser** (2026-09-27): all 10 gallery examples run and step both ways;
 the tour program gives exactly its expected output in 137 steps; the explainer was read at every
 one of those steps (which found and fixed two bugs); step over, step out and stops work on the tour;
 typos, division by zero, endless loops and endless recursion all stop cleanly with clear messages.
+
+**v0.2 checked in the browser** (2026-09-27): dark, light and the ~960px frame. "Where from?" on
+the tour (`total` → line 93; recursive `n` → "called factorial and passed in n = 3"). The galaxy on
+factorial, fibonacci and fib(16) (3,194 calls, 1,194 folded, 4 ms per step): the layout, labels,
+hover, click-to-jump and theme switching.
 
 ## Releasing on wearechintu.com
 

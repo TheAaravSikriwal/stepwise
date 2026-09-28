@@ -60,8 +60,12 @@
 
     <main>
       <section class="panel card editor-panel">
-        <h2>Your code</h2>
-        <div id="editor"></div>
+        <div class="tabs" role="tablist" aria-label="What to show">
+          <button id="tab-code" type="button" role="tab" aria-selected="true" aria-controls="editor">Your code</button>
+          <button id="tab-galaxy" type="button" role="tab" aria-selected="false" aria-controls="galaxy" title="See every function call in the run as a 3D map you can look around">Call galaxy</button>
+        </div>
+        <div id="editor" role="tabpanel" aria-labelledby="tab-code"></div>
+        <div id="galaxy" class="galaxy" role="tabpanel" aria-labelledby="tab-galaxy" hidden></div>
       </section>
       <div class="side">
         <section class="panel card">

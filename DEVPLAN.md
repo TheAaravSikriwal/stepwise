@@ -314,7 +314,11 @@ committed before the next.
 - **Tests:** unit tests on the fixtures (the same variable in different calls, a variable set
   before a loop, parameters set at the call), and a check on the tour in the browser.
 
-### Stage C: the call galaxy (3D)
+### Stage C: the call galaxy (3D) (done 2026-09-27)
+- **As built:** `web/src/galaxy/` (`model.ts` the tree and layout, `view.ts` the three.js scene,
+  `panel.ts` the tab). Calls past the cap fold into their nearest kept caller; the tooltip and the
+  legend say how many, rather than a "×N" label. Only `main`, the current call and the first call
+  of each recursion are named, so deep recursion doesn't bury the view in labels.
 - A **3D view of the run**: every function call is a bubble, and the calls it makes cluster around
   it (recursion becomes a chain). Each call's variables are small bubbles orbiting it. Size means
   time spent in that call, and the call running now glows yellow. Drag to look around, scroll to
