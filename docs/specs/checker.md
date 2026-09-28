@@ -1,6 +1,6 @@
 # Spec: the checker (name resolution and type checking)
 
-**Owner:** you · **Files:** `compiler/src/checker.rs` (yours; split it into `resolve.rs` and
+**Status:** built (2026-09-27) · **Files:** `compiler/src/checker.rs` (yours; split it into `resolve.rs` and
 `types.rs` if you like), `compiler/src/checked.rs` (shared output types, draft)
 **Tests:** `compiler/tests/checker.rs` · **Run:** `cargo test --test checker`
 **Reading:** *Crafting Interpreters*, chapter 11 ("Resolving and Binding"). Type checking isn't

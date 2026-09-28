@@ -1,6 +1,6 @@
 # Spec: the replay engine
 
-**Owner:** you · **File:** `web/src/replay/replay.ts` (yours) · **Interface:** `web/src/replay/types.ts` (shared draft)
+**Status:** built (2026-09-27) · **File:** `web/src/replay/replay.ts` (yours) · **Interface:** `web/src/replay/types.ts` (shared draft)
 **Tests:** `web/tests/replay.test.ts` (correctness), `web/tests/replay-perf.test.ts` (speed)
 **Run:** `cd web && npx vitest run tests/replay`
 **Reading:** product plan §5.2 ("Record, then replay"); write-ups of `rr` and other time-travel debuggers

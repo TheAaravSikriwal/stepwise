@@ -1,6 +1,6 @@
 # Spec: the parser
 
-**Owner:** you · **Files:** `compiler/src/parser.rs` (yours), `compiler/src/ast.rs` (shared draft)
+**Status:** built (2026-09-27) · **Files:** `compiler/src/parser.rs` (yours), `compiler/src/ast.rs` (shared draft)
 **Tests:** `compiler/tests/parser.rs`, `compiler/tests/parser_depth.rs`
 **Run:** `cargo test --test parser --test parser_depth`
 **Reading:** *Crafting Interpreters*, chapters 5 ("Representing Code"), 6 ("Parsing Expressions")

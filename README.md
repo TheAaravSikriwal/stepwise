@@ -3,8 +3,8 @@
 Write code in a small teaching language, run it in your browser, and **step backward** through
 every line to see exactly what happened.
 
-> Status: in development. The playground, debugger UI, example gallery and shareable links work.
-> The compiler stages and the replay engine are being written; see [STATUS.md](STATUS.md).
+> Status: the MVP works end to end: write a program, run it, and step through it in both directions,
+> with every step explained in plain English. See [STATUS.md](STATUS.md).
 
 ## How it works
 
@@ -32,12 +32,12 @@ that recording in either direction. There's no server: everything runs in the br
 You need Rust (stable, with the `wasm32-unknown-unknown` target), `wasm-pack`, and Node 24+.
 
 ```bash
-cargo test --workspace          # compiler tests
+cargo test --workspace          # compiler tests (all of them)
 cd web
 npm install
 npm run wasm                    # build the compiler to web/pkg
 npm test                        # runtime + end-to-end tests
-npm run dev                     # http://localhost:5173 (add ?demo to preview the debugger)
+npm run dev                     # http://localhost:5173
 ```
 
 Rebuild with `npm run wasm` after changing any Rust code.

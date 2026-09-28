@@ -1,6 +1,6 @@
 # Spec: the lexer
 
-**Owner:** you · **File:** `compiler/src/lexer.rs` · **Tests:** `compiler/tests/lexer.rs`
+**Status:** built (2026-09-27) · **File:** `compiler/src/lexer.rs` · **Tests:** `compiler/tests/lexer.rs`
 **Run:** `cargo test --test lexer` · **Reading:** *Crafting Interpreters*, chapter 4 ("Scanning")
 
 ## What it does

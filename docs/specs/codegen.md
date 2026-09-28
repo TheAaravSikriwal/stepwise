@@ -1,6 +1,6 @@
 # Spec: code generation and instrumentation
 
-**Owner:** you · **Files:** `compiler/src/codegen.rs` (yours; `instrument.rs` too if you like)
+**Status:** built (2026-09-27) · **Files:** `compiler/src/codegen.rs` (yours; `instrument.rs` too if you like)
 **Tests:** `compiler/tests/codegen.rs` and the golden programs in `compiler/tests/programs/`
 **Run:** `cargo test --test codegen` · **Try it:** `cargo run -p stepc -- wat docs/examples/factorial.step`
 **Reading:** the `wasm-encoder` docs, `compiler/src/stub.rs` (a complete tiny module), and MDN's

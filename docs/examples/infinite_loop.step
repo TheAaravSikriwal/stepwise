@@ -1,5 +1,5 @@
 // This loop never ends: `i` goes up, but the condition checks `j`.
-// Stepwise stops it after a million steps. Then step backward to see why.
+// Stepwise stops it after a while. Then step backward to see why.
 fn main() {
     let mut i = 0;
     let j = 0;

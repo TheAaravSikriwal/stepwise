@@ -103,5 +103,5 @@ print(3 < 4);    // prints true
   the problem.
 - **Dividing by zero**, or recursion that never stops, ends the program with a message. You can
   still step through everything that happened before.
-- A program that runs for more than **a million steps** is stopped, since it's probably an
+- A program that runs for a very long time (hundreds of thousands of steps) is stopped, since it's probably an
   infinite loop, and you can step backward to find out why.

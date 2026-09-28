@@ -27,19 +27,22 @@ print: 6
 ```
 
 The whole program runs to the end first, usually in a few milliseconds. A long run can write a
-million entries. If a program is still going at a million steps, Stepwise stops it, because it's
+million entries. If a program is still going after that, Stepwise stops it, because it's
 almost certainly an infinite loop.
 
 ## 3. The debugger replays the recording
 
 When you step forward, the debugger reads the next diary entries and updates what you see.
-When you step **back**, it undoes them. Undoing is cheap because every change was recorded with
-its *old* value: "x changed from 5 to 6" can be undone by setting `x` back to 5.
 
-To jump far (say, from step 900,000 to step 12), undoing one entry at a time would be slow. So
-while reading the recording for the first time, the debugger saves a full picture of the state
-every thousand steps. To jump anywhere, it starts from the nearest saved picture and replays at
-most a thousand steps from there.
+Stepping **back** uses a trick. While reading the recording for the first time, the debugger saves
+a full picture of the program's state (every function running and every variable's value) once
+every thousand steps. To show any moment, whether one step back or a jump from step 900,000 to step
+12, it takes the nearest picture from before that moment and replays at most a thousand diary
+entries from there. It works the same in both directions, and it's fast enough to feel instant even
+on a million-step run.
+
+The recording also keeps each change's *old* value ("x changed from 5 to 6"). That's how the
+"What just happened" box can tell you what changed and what it was before.
 
 Real debuggers use the same idea. This way of doing it is called *record and replay*.
 

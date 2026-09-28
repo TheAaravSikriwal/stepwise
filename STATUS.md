@@ -4,95 +4,64 @@ _Last updated: 2026-09-27_
 
 ## Where we are
 
-**All the plumbing for the MVP and most of 1.0 is built and tested.** What's left is the core,
-which is yours: every piece has a spec in `docs/specs/` and a failing test suite waiting for it.
+**Stepwise works end to end.** Write a program, press Run, and step through it forwards and
+backwards, with a plain-English explanation of every step.
 
-Working now:
-- **Playground:** CodeMirror editor with highlighting, error underlines, Ctrl+Enter to run.
-  Programs compile and run in a Web Worker, with a million-event limit, friendly runtime errors,
-  and real messages if the compiler panics.
-- **Debugger UI:** call stack, variables with change highlights, output synced to the step, a
-  timeline, step / over / out / breakpoints in both directions, keyboard shortcuts. Preview it at
-  `http://localhost:5173/?demo`. With real programs it switches on as soon as `createReplay` works.
-- **Example gallery** (10 programs), **shareable links**, and **language reference** and **How it
-  works** pages.
-- **Staged pipeline:** `PIPELINE` in `compiler/src/lib.rs` lets the playground use your real stages
-  one at a time. The rest is a stub that always prints 42.
-- **CI** on every push: fmt, clippy, all finished tests, the wasm build, the web tests, the site
-  build. Tests for pieces still in progress run and report, but don't fail the build.
+- **Compiler** (Rust → WebAssembly): lexer, parser, checker and codegen with trace instrumentation.
+  Friendly error messages before anything runs (15 of them are snapshot-tested).
+- **Runtime:** runs in a Web Worker, with a limit on runaway programs and plain-English runtime
+  errors (division by zero, recursion that never stops).
+- **Replay engine:** snapshots every 1,000 steps; any seek, in either direction, loads the nearest
+  snapshot and replays forward. Fast on a million-event run.
+- **Playground:** cobalt, white, safety yellow and black. A "What just happened" explainer for
+  every step, variables with change highlights, functions running, output synced to the step,
+  step / skip over / finish function / stops in both directions, a timeline, the example gallery,
+  share links, and the language and "How it works" pages.
 
-## Next: your track, in order
+**Tests:** everything is required in CI.
+- Rust (`cargo test --workspace`): lexer 29, parser 47, checker 58, error messages 15, codegen
+  (7 exact traces and 23 golden programs, including the "tour" program), the 10 gallery examples,
+  and trace-consistency checks on every run.
+- Web (`npm test` in `web/`): 74 tests, including the replay engine (18 correctness, 4 speed), the
+  explainer, step navigation, share links, and all 23 golden programs again in the browser runtime.
 
-1. **Lexer:** read `docs/specs/lexer.md`, then make `cargo test --test lexer` pass (29 tests).
-2. **Parser:** read `docs/specs/parser.md`, then `cargo test --test parser --test parser_depth`
-   (44 + 3). Review the draft AST in `compiler/src/ast.rs` first. It's shared, so change what you
-   like, but tell me.
-3. **Checker:** read `docs/specs/checker.md`, then `cargo test --test checker` (58), then
-   `cargo test --test error_messages` and `cargo insta review` to approve your error messages.
-4. **Codegen:** read `docs/specs/codegen.md`, then `cargo test --test codegen --test examples`
-   (exact traces, 22 golden programs, the 10 gallery examples).
-5. **Replay engine** (doesn't depend on the compiler, so do it whenever):
-   `docs/specs/replay.md`, then `cd web && npx vitest run tests/replay` (18 correctness + 4 speed).
+**Checked by hand in the browser** (2026-09-27): all 10 gallery examples run and step both ways;
+the tour program gives exactly its expected output in 137 steps; the explainer was read at every
+one of those steps (which found and fixed two bugs); step over, step out and stops work on the tour;
+typos, division by zero, endless loops and endless recursion all stop cleanly with clear messages.
 
-After each stage passes: bump `PIPELINE` (Lexer, Parser, Checker, Codegen), run `npm run wasm` in
-`web/`, try broken programs in the playground, and move that stage's CI step up into the
-required tests. When you're stuck, ask for a hint level (DEVPLAN.md §7.2).
+## Releasing on wearechintu.com
 
-Every test suite was checked against a throwaway reference implementation (kept outside the repo,
-and deleted), so a failing test means a bug in the code under test, not in the test.
+Stepwise ships as part of the site, the way the site itself is released (Vercel: every pushed
+branch gets a preview, and merging to `main` publishes). **Nothing is published until you've tested
+it and said so.**
 
-## Releasing through wearechintu.com
+Ready: the site's local branch **`stepwise`** in the worktree
+`D:\VisualStudioProjects\gitbuddywebsite-stepwise` (not pushed). It has the portfolio line
+"Stepwise: a debugger that runs in reverse", the Stepwise side, and `/stepwise` with the framed
+playground under its own security policy.
 
-Decided 2026-09-27: Stepwise ships **as part of the wearechintu.com site**, the same way the site
-itself is released (Vercel: every pushed branch gets a preview, and merging to `main` publishes).
-It's the third line on the portfolio, "Stepwise: a debugger that runs in reverse". The built
-playground is copied into the site at `public/stepwise-app/` and framed at
-**wearechintu.com/stepwise**. Nothing is published until the compiler and replay engine pass
-their tests, and until you've tried it on a preview.
-
-Already done:
-- **This repo:** `npm run export-site -- <site checkout>` (in `web/`). It builds the compiler,
-  runs every Rust and web test, builds the site, and copies it with a `VERSION` stamp. Also the
-  `?embed&theme=dark` framed view, and Share links that point at the host page when framed.
-- **The site:** the local branch **`stepwise`** in the worktree
-  `D:\VisualStudioProjects\gitbuddywebsite-stepwise`. Not pushed. It has the portfolio line, a
-  Stepwise side (header, transition, dark page), `/stepwise` with the framed playground, and a
-  separate security policy for `/stepwise-app/` that allows WebAssembly and same-site framing
-  (every other page keeps the strict one). The site's 413 tests pass; its build passes apart from
-  `/api/bundles`, which needs the Supabase keys that only Vercel has.
-- **Tested locally** (2026-09-27) with a real export: the framed app compiles and runs programs
-  under the new policy, `/stepwise` itself still can't run wasm or be framed, and Share links
-  round-trip through `/stepwise#code=…`.
-
-To release (once the MVP passes its tests):
-1. **Test the app on its own:** `npm run dev` in `web/` and try the gallery, some broken programs,
-   and stepping back and forth.
+To release:
+1. **Test the app yourself:** `npm run dev` in `web/`, then http://localhost:5173.
 2. **Export into the site:** `npm run export-site -- D:\VisualStudioProjects\gitbuddywebsite-stepwise`
-   (without `STEPWISE_SKIP_TESTS`, so the tests run).
+   in `web/` (it runs every test first).
 3. **Test inside the site locally:** `npm run dev` in the site worktree, then open
    http://localhost:3000/stepwise.
 4. **Commit** `public/stepwise-app/` on the site's `stepwise` branch and **push it**. Vercel builds a
    preview URL, and you test there: that's the real production setup.
 5. **Merge to `main`** when you're happy. That publishes it.
 
-For later updates, repeat steps 2–5 (export, test, commit, preview, merge).
+For later updates, repeat steps 2–5.
 
-## My track
+## Open questions
 
-Waiting on your decisions:
 - **LICENSE:** MIT, which needs the name to put on it.
-- **Social preview image:** after going live, since it needs the final URL.
-
-Later: arrays and strings (v1.0) touch every stage, so they wait until the MVP works.
+- **Social preview image:** once the final URL is live.
 
 ## Notes
 
-- `docs/how-it-works.md` describes undo plus snapshots. Update it once you've chosen your replay
-  design.
-- Smart App Control was turned off on 2026-09-27 (it blocked rustc's own DLLs). fmt, clippy and the
-  tests all work now.
-- GitHub: https://github.com/TheAaravSikriwal/stepwise (public). Git has no credential helper, so
-  pushes use `git -c credential.helper= -c "credential.helper=!gh auth git-credential" push`. Run
+- Smart App Control was turned off on 2026-09-27 (it blocked rustc's own DLLs).
+- GitHub: https://github.com/TheAaravSikriwal/stepwise (public). Pushes use
+  `git -c credential.helper= -c "credential.helper=!gh auth git-credential" push`, or run
   `gh auth setup-git` once to make plain `git push` work.
-- `cargo test --workspace` currently fails, because the core tests are waiting for your code. Use the
-  commands above to run one piece at a time.
+- Later (v1.0): arrays and strings touch every stage, and "where did this value come from?"

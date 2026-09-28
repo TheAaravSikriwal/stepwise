@@ -76,7 +76,7 @@ export function describeOutcome(outcome: Outcome): string | null {
     case "ok":
       return null;
     case "limit":
-      return `Stopped after ${outcome.limit.toLocaleString("en-US")} steps. Is there an infinite loop? You can still step through what ran.`;
+      return "It ran for a very long time, so Stepwise stopped it. Is there a loop that never ends? You can still step through everything that ran.";
     case "error":
       return outcome.message;
   }

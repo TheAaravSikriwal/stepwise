@@ -222,7 +222,7 @@ checklist.
 | **Wrong answer** from a compiled program | A golden test fails | Shrink the program to the smallest one that still fails, keep it as a new golden test, then compare `--ast` and `--wat` output |
 | **Wrong line highlighted** | Line-highlight golden tests | Find the pipeline stage that lost the span. Spans must never be dropped (product plan, 5.1) |
 | **Replay differs from the real run** | Property harness | It reports the first step and event where they diverge; debug from there, never from the end |
-| **Infinite loop** | Event counter hits the limit | The host function throws, the partial trace is kept, and the UI says "Stopped after N steps" |
+| **Infinite loop** | Event counter hits the limit | The host function throws, the partial trace is kept, and the UI says it ran too long and asks whether a loop never ends |
 | **Recursion too deep** | JS `RangeError` from the WASM stack | Catch it and report "recursion too deep" at the last line reached. The partial trace stays debuggable |
 | **Division by zero**, or `INT_MIN / -1` | WASM trap | Map the trap to plain English at the last `line` event |
 | **Huge traces** | Memory checks on long programs | Growable typed arrays, the event limit, and snapshots in Phase 7 |
