@@ -8,7 +8,8 @@ public launch.
 ### Added
 - **The call galaxy:** a "Call galaxy" view beside "Your code" shows the whole run in 3D, filling
   the page, with the panels floating over it as frosted glass. Every
-  function call is a bubble (bigger means more steps ran in it), the calls it made sit around it,
+  function call is a bubble, each function in its own clear colour (sapphire, emerald, ruby,
+  amethyst, teal and more) (bigger means more steps ran in it), the calls it made sit around it,
   and recursion curls into a chain. The call running now glows gold, finished calls fade, and
   the running calls' variables orbit as moons. Drag to look around, scroll to zoom, hover for
   details, click a bubble to jump there. It follows every step. Past 2,000 calls, later ones fold

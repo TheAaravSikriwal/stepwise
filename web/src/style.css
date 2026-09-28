@@ -347,6 +347,8 @@ button.quiet:hover:not(:disabled) {
 }
 
 .stepper {
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -386,7 +388,9 @@ button.quiet:hover:not(:disabled) {
 #timeline {
   --p: 0%;
   appearance: none;
-  width: 11rem;
+  flex: 1 1 8rem;
+  min-width: 4rem;
+  max-width: 16rem;
   height: 4px;
   margin: 0 0.4rem;
   border-radius: var(--pill);
@@ -422,7 +426,7 @@ button.quiet:hover:not(:disabled) {
   font-size: 0.82rem;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
-  min-width: 7rem;
+  white-space: nowrap;
 }
 
 /* "More moves": the advanced moves, each explained in words. */
@@ -1168,7 +1172,8 @@ html[data-view="galaxy"] .explain::before {
   }
 
   #timeline {
-    width: 100%;
+    flex-basis: 100%;
+    max-width: none;
   }
 
   html[data-view="galaxy"] .code-view {
@@ -1200,6 +1205,19 @@ html.embedded .topbar {
 
 html.embedded .views button {
   padding-block: 0.55rem;
+}
+
+html.embedded .toolbar {
+  gap: 0.5rem 0.7rem;
+}
+
+html.embedded .stepper button,
+html.embedded .more summary {
+  padding-inline: 0.75rem;
+}
+
+html.embedded button.run {
+  padding-inline: 1.15rem;
 }
 
 /* The frame is only so tall: tighter spacing gives the code more room. */

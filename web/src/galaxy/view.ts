@@ -16,13 +16,16 @@ import { type FrameView, varKey } from "../replay/types";
 import { type CallTree, type Phase, type Vec3, layout, phasesAt, radiusOf } from "./model";
 
 /**
- * One colour per function, cycled; `main` always gets the first. Metals and
- * pearl: ivory, silver, champagne, bronze, pewter, copper. Gold itself is
- * kept for the call running now, so nothing else is mistaken for it.
+ * One colour per function, cycled, so each function is easy to tell apart:
+ * jewel tones (sapphire, emerald, ruby, amethyst, teal, rose, azure, jade),
+ * rich rather than neon so they sit with the black and gold. `main` is
+ * ivory (ink on the light theme). Gold, and anything near it (amber,
+ * orange), is kept for the call running now, so nothing else is mistaken
+ * for it.
  */
 const PALETTES = {
-  dark: ["#f4f1ea", "#c9c3b6", "#e8d5a3", "#b8925e", "#8f8a80", "#d9cfb8", "#a8744e", "#efe6d2"],
-  light: ["#1a1917", "#5f5a52", "#8b6a3a", "#6d5a2e", "#3a3631", "#9a8f7a", "#7a5230", "#2d2a26"],
+  dark: ["#f4f1ea", "#5b8def", "#3fbf87", "#e5566b", "#a77bf3", "#2fb8c4", "#f07ab8", "#7cc4ff", "#8fd694"],
+  light: ["#1a1917", "#2f5fc4", "#1f8f5f", "#c0364c", "#7b4fd0", "#1a8a96", "#c44d8f", "#3a8fd6", "#4f9a4a"],
 };
 const NOW = { dark: "#f1c84b", light: "#c9a227" };
 const MAX_MOONS = 400;
@@ -198,7 +201,7 @@ export class GalaxyView {
       this.bubbles.setMatrixAt(i, matrix);
       if (i === current) colour.copy(this.now);
       else if (phases[i] === "running") colour.copy(this.baseColours[i]);
-      else colour.copy(this.baseColours[i]).lerp(this.muted, 0.65);
+      else colour.copy(this.baseColours[i]).lerp(this.muted, 0.45);
       this.bubbles.setColorAt(i, colour);
     });
     this.bubbles.instanceMatrix.needsUpdate = true;

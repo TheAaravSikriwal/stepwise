@@ -345,3 +345,6 @@ feels expensive.
   over it, so the map under them blurs and the values stay the thing you read. The camera centres
   the map in the open space left of the panels (`GalaxyView.setFocus`).
 - **Variables:** "`fib`'s variables at step 85", with Name and Value headings.
+- **Galaxy colours:** each function gets a clear colour, jewel tones rich enough to sit with the
+  black and gold (sapphire, emerald, ruby, amethyst, teal, rose, azure, jade); `main` is ivory.
+  Gold and anything near it is kept for the call running now.
