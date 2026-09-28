@@ -625,9 +625,17 @@ main {
 
 .side {
   display: grid;
-  grid-template-rows: minmax(9rem, 1.4fr) minmax(5rem, 0.8fr) auto;
+  grid-template-rows: auto auto minmax(9rem, 1.4fr) minmax(5rem, 0.8fr) auto;
   gap: var(--gap);
   min-height: 0;
+}
+
+/* "Your code" | "Call galaxy" head the side column, over Variables, rather
+   than taking a row of their own across the top. */
+.side > .views {
+  grid-column: 1;
+  grid-row: auto;
+  justify-self: start;
 }
 
 .panel {
@@ -1227,7 +1235,7 @@ html[data-view="galaxy"] .explain::before {
   }
 
   .side {
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto auto auto auto;
   }
 
   .vars,
@@ -1255,7 +1263,8 @@ html[data-view="galaxy"] .explain::before {
 
 /* ------------------------------------------ embedded in wearechintu.com -- */
 
-/* The host page has the title, nav and theme; the two views stay, centred. */
+/* The host page has the title, nav and theme, and the two views live in the
+   side column, so the top bar has nothing left to show and goes. */
 html.embedded .topbar > h1,
 html.embedded .topbar nav,
 html.embedded #theme-toggle,
@@ -1264,7 +1273,7 @@ html.embedded body.doc > header {
 }
 
 html.embedded .topbar {
-  padding-block: 0;
+  display: none;
 }
 
 html.embedded .views button {
@@ -1415,4 +1424,37 @@ article tr + tr td {
 
 article a {
   color: var(--gold);
+}
+
+/* ------------------------------------------------- two columns, no rows -- */
+
+/* Run and the stepper head the code column, and "what just happened" heads
+   the side column next to them, so neither takes a row across the page and
+   the code gets that height instead. */
+.explain {
+  position: relative;
+}
+
+.code-view > .toolbar {
+  margin-bottom: var(--gap);
+}
+
+/* The galaxy hides the code, but not the controls for moving through it. */
+html[data-view="galaxy"] .code-view > .toolbar {
+  visibility: visible;
+}
+
+html[data-view="galaxy"] .side > .explain {
+  max-width: none;
+  align-self: stretch;
+}
+
+@media (max-width: 800px) {
+  html[data-view="galaxy"] .code-view {
+    display: flex;
+  }
+
+  html[data-view="galaxy"] .code-view > :not(.toolbar) {
+    display: none;
+  }
 }

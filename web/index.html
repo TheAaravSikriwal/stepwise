@@ -13,14 +13,6 @@
 
     <header class="topbar">
       <h1 class="brand"><a href="./">Stepwise</a></h1>
-      <div class="views" role="tablist" aria-label="What to show">
-        <button id="tab-code" type="button" role="tab" aria-selected="true" aria-controls="code-view">
-          <span class="view-icon" aria-hidden="true">{ }</span> Your code
-        </button>
-        <button id="tab-galaxy" type="button" role="tab" aria-selected="false" aria-controls="galaxy" title="See every function call in the run as a 3D map you can look around">
-          <span class="view-icon" aria-hidden="true">✦</span> Call galaxy
-        </button>
-      </div>
       <div class="topbar-end">
         <button id="theme-toggle" type="button" class="quiet"></button>
         <nav>
@@ -30,46 +22,44 @@
       </div>
     </header>
 
-    <section class="toolbar" aria-label="Run and step through your program">
-      <button id="run" type="button" class="run" title="Run your program (Ctrl+Enter)">▶ Run</button>
-
-      <div class="stepper" role="toolbar" aria-label="Step through your program">
-        <button id="to-start" type="button" title="Go back to the very beginning (Home key)">⏮ Start</button>
-        <button id="step-back" type="button" title="Go back one step (← key)">◀ Back</button>
-        <button id="step-forward" type="button" class="next" title="Run the next line (→ key)">Next step ▶</button>
-        <button id="to-end" type="button" title="Jump to the end (End key)">End ⏭</button>
-        <input id="timeline" type="range" min="0" max="0" value="0" aria-label="Drag to move through the run" />
-        <span id="step-label" class="step-label" aria-live="polite"></span>
-
-        <details class="more">
-          <summary title="Skip over function calls, finish a function, or jump between stops">More moves</summary>
-          <div class="menu">
-            <button id="step-over" type="button">
-              <strong>Skip over function calls</strong>
-              <span>Go to the next line here, without going inside functions it calls. Shift + →</span>
-            </button>
-            <button id="step-out" type="button">
-              <strong>Finish this function</strong>
-              <span>Run until the current function is done, and go back to where it was called.</span>
-            </button>
-            <button id="next-break" type="button">
-              <strong>Go to the next stop</strong>
-              <span>Jump ahead to the next time a line with a stop runs. Page Down</span>
-            </button>
-            <button id="prev-break" type="button">
-              <strong>Back to the previous stop</strong>
-              <span>Jump back to the last time a line with a stop ran. Page Up</span>
-            </button>
-            <p class="menu-hint">To put a stop on a line, click just left of its line number.</p>
-          </div>
-        </details>
-      </div>
-    </section>
-
-    <section id="explain" class="explain" aria-live="polite"></section>
-
     <main>
       <section id="code-view" class="code-view" role="tabpanel" aria-labelledby="tab-code">
+        <!-- Run and the stepper head the code column. -->
+        <section class="toolbar" aria-label="Run and step through your program">
+          <button id="run" type="button" class="run" title="Run your program (Ctrl+Enter)">▶ Run</button>
+
+          <div class="stepper" role="toolbar" aria-label="Step through your program">
+            <button id="to-start" type="button" title="Go back to the very beginning (Home key)">⏮ Start</button>
+            <button id="step-back" type="button" title="Go back one step (← key)">◀ Back</button>
+            <button id="step-forward" type="button" class="next" title="Run the next line (→ key)">Next step ▶</button>
+            <button id="to-end" type="button" title="Jump to the end (End key)">End ⏭</button>
+            <input id="timeline" type="range" min="0" max="0" value="0" aria-label="Drag to move through the run" />
+            <span id="step-label" class="step-label" aria-live="polite"></span>
+
+            <details class="more">
+              <summary title="Skip over function calls, finish a function, or jump between stops">More moves</summary>
+              <div class="menu">
+                <button id="step-over" type="button">
+                  <strong>Skip over function calls</strong>
+                  <span>Go to the next line here, without going inside functions it calls. Shift + →</span>
+                </button>
+                <button id="step-out" type="button">
+                  <strong>Finish this function</strong>
+                  <span>Run until the current function is done, and go back to where it was called.</span>
+                </button>
+                <button id="next-break" type="button">
+                  <strong>Go to the next stop</strong>
+                  <span>Jump ahead to the next time a line with a stop runs. Page Down</span>
+                </button>
+                <button id="prev-break" type="button">
+                  <strong>Back to the previous stop</strong>
+                  <span>Jump back to the last time a line with a stop ran. Page Up</span>
+                </button>
+                <p class="menu-hint">To put a stop on a line, click just left of its line number.</p>
+              </div>
+            </details>
+          </div>
+        </section>
         <div class="code-head">
           <select id="examples" aria-label="Open an example program"></select>
           <span id="share-status" class="share-status" aria-live="polite"></span>
@@ -78,6 +68,17 @@
         <div id="editor"></div>
       </section>
       <aside class="side">
+        <!-- What just happened heads the side column, next to Run. -->
+        <section id="explain" class="explain" aria-live="polite"></section>
+        <!-- The two views head the side column, over Variables. -->
+        <div class="views" role="tablist" aria-label="What to show">
+          <button id="tab-code" type="button" role="tab" aria-selected="true" aria-controls="code-view">
+            <span class="view-icon" aria-hidden="true">{ }</span> Your code
+          </button>
+          <button id="tab-galaxy" type="button" role="tab" aria-selected="false" aria-controls="galaxy" title="See every function call in the run as a 3D map you can look around">
+            <span class="view-icon" aria-hidden="true">✦</span> Call galaxy
+          </button>
+        </div>
         <section class="panel">
           <h2>Variables <span class="sub">their values right now</span></h2>
           <div id="vars" class="vars"></div>
