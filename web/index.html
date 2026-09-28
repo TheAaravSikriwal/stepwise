@@ -8,18 +8,19 @@
     <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
-    <header class="topbar">
+    <header class="topbar card">
       <h1 class="brand"><a href="./">Stepwise</a></h1>
       <select id="examples" aria-label="Open an example program"></select>
       <button id="share" type="button" class="quiet" title="Copy a link to this program, to send to someone">Share</button>
       <span id="share-status" class="share-status" aria-live="polite"></span>
+      <button id="theme-toggle" type="button" class="quiet"></button>
       <nav>
         <a href="./language.html">The language</a>
         <a href="./how-it-works.html">How it works</a>
       </nav>
     </header>
 
-    <section class="toolbar" aria-label="Run and step through your program">
+    <section class="toolbar card" aria-label="Run and step through your program">
       <button id="run" type="button" class="run" title="Run your program (Ctrl+Enter)">▶ Run</button>
 
       <div class="stepper" role="toolbar" aria-label="Step through your program">
@@ -55,23 +56,23 @@
       </div>
     </section>
 
-    <section id="explain" class="explain" aria-live="polite"></section>
+    <section id="explain" class="explain card" aria-live="polite"></section>
 
     <main>
-      <section class="panel editor-panel">
+      <section class="panel card editor-panel">
         <h2>Your code</h2>
         <div id="editor"></div>
       </section>
       <div class="side">
-        <section class="panel">
+        <section class="panel card">
           <h2>Variables <span class="sub">their values right now</span></h2>
           <div id="vars" class="vars"></div>
         </section>
-        <section class="panel">
+        <section class="panel card">
           <h2>Output <span class="sub">what <code>print</code> showed, and any problems</span></h2>
           <pre id="output" class="output" aria-live="polite"></pre>
         </section>
-        <section class="panel">
+        <section class="panel card">
           <h2>Functions running <span class="sub">the newest on top</span></h2>
           <div id="stack" class="stack"></div>
         </section>

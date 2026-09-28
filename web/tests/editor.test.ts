@@ -2,28 +2,36 @@ import { StringStream } from "@codemirror/language";
 import { describe, expect, it } from "vitest";
 import type { Diagnostic } from "../src/compiler";
 import { toLint } from "../src/editor/editor";
-import { token } from "../src/editor/language";
+import { startState, token } from "../src/editor/language";
 
-/** Runs the highlighter over one line, returning `[text, style]` pairs (whitespace dropped). */
-function highlight(line: string): [string, string | null][] {
-  const stream = new StringStream(line, 4, 4);
+/**
+ * Runs the highlighter over some lines (sharing state, as the editor does),
+ * returning `[text, style]` pairs with whitespace dropped.
+ */
+function highlight(...lines: string[]): [string, string | null][] {
+  const state = startState();
   const out: [string, string | null][] = [];
-  while (!stream.eol()) {
-    stream.start = stream.pos;
-    const style = token(stream);
-    const text = stream.current();
-    if (text.trim()) out.push([text, style]);
+  for (const line of lines) {
+    const stream = new StringStream(line, 4, 4);
+    while (!stream.eol()) {
+      stream.start = stream.pos;
+      const style = token(stream, state);
+      const text = stream.current();
+      if (text.trim()) out.push([text, style]);
+    }
   }
   return out;
 }
 
+const styleOf = (pairs: [string, string | null][], text: string) => pairs.filter(([t]) => t === text).map(([, s]) => s);
+
 describe("highlighter", () => {
-  it("classifies each kind of token", () => {
+  it("colours a function signature by kind", () => {
     expect(highlight("fn factorial(n: int) -> int {")).toEqual([
-      ["fn", "keyword"],
-      ["factorial", "function"],
+      ["fn", "definitionKeyword"],
+      ["factorial", "functionDef"],
       ["(", "bracket"],
-      ["n", "variableName"],
+      ["n", "param"],
       [":", "punctuation"],
       ["int", "typeName"],
       [")", "bracket"],
@@ -33,9 +41,29 @@ describe("highlighter", () => {
     ]);
   });
 
+  it("keeps colouring parameters inside their function, and calls as calls", () => {
+    const pairs = highlight("fn f(n: int) -> int {", "    return n * f(n - 1);", "}");
+    expect(styleOf(pairs, "n")).toEqual(["param", "param", "param"]);
+    expect(styleOf(pairs, "f")).toEqual(["functionDef", "function"]);
+    expect(styleOf(pairs, "return")).toEqual(["controlKeyword"]);
+  });
+
+  it("forgets parameters when the next function starts", () => {
+    const pairs = highlight("fn a(n: int) { }", "fn main() {", "    let n = 1;", "    print(n);", "}");
+    expect(styleOf(pairs, "n")).toEqual(["param", "variableDef", "variableName"]);
+  });
+
+  it("marks where a variable is made, with or without mut", () => {
+    expect(highlight("let mut total = 0;").slice(0, 3)).toEqual([
+      ["let", "definitionKeyword"],
+      ["mut", "definitionKeyword"],
+      ["total", "variableDef"],
+    ]);
+  });
+
   it("handles comments, literals, builtins and bad characters", () => {
     expect(highlight("print(true && 42) # // done")).toEqual([
-      ["print", "standard"],
+      ["print", "builtin"],
       ["(", "bracket"],
       ["true", "bool"],
       ["&&", "operator"],

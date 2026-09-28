@@ -279,3 +279,51 @@ Ask for one level at a time:
 
 **Decided: Stepwise.** Folder `stepwise/`, crates `stepwise-compiler` / `stepwise-wasm`, CLI `stepc`, files `*.step`, host import module `"sw"`.
 extension and the folder name. See the options in chat.
+
+---
+
+## 10. Plan for v0.2: the Electric look, "where did this value come from?", and the call galaxy
+
+Decided 2026-09-28. Build in this order; each stage is tested, checked in the browser, and
+committed before the next.
+
+### Stage A: the Electric look
+- **Theme:** GitHub-dark style (page #0d1117, panels #161b22, borders #30363d), cobalt/blue for
+  actions, yellow (#ffd100) for "now" (the current line and just-changed values). A **light
+  version** follows the OS setting and has a toggle that's remembered. `?theme=dark` still forces
+  dark for the wearechintu.com frame.
+- **Nothing sharp:** rounded cards with gaps between them instead of hard dividing lines, pill
+  buttons and menus, soft transitions (hover, the changed-value flash, menus opening).
+- **Colour by kind of code**, using a highlighter that tracks context:
+  - declaration keywords (`fn`, `let`, `mut`) and control-flow keywords (`if`, `else`, `while`,
+    `return`) each get their own colour;
+  - function names get one colour where they're defined (bold) and another where they're called;
+  - parameters (recognised in the signature, then everywhere in that function's body);
+  - a variable being made (after `let`);
+  - types, numbers, `true`/`false`, the built-in `print`, operators and comments.
+- **Done when:** the gallery, tour, errors, stops and menus all look right in dark, light and the
+  ~960px frame, and every existing test still passes.
+
+### Stage B: "Where did this value come from?"
+- Each variable in the Variables panel gets a "where from?" button. It jumps to the moment that
+  value was set, flashes the line that set it, and the explainer says what happened ("`total` was
+  set on line 113: it changed from 14 to 30").
+- **How:** the replay engine records which call each event belongs to, so it can scan back from
+  the current step for the last `declare`/`assign` of that variable in that same call. This is
+  exact even when recursion has many copies of the same variable.
+- **Tests:** unit tests on the fixtures (the same variable in different calls, a variable set
+  before a loop, parameters set at the call), and a check on the tour in the browser.
+
+### Stage C: the call galaxy (3D)
+- A **3D view of the run**: every function call is a bubble, and the calls it makes cluster around
+  it (recursion becomes a chain). Each call's variables are small bubbles orbiting it. Size means
+  time spent in that call, and the call running now glows yellow. Drag to look around, scroll to
+  zoom, click a bubble to jump to that moment. It grows and shrinks as you move through the run.
+- **How:** three.js, loaded only when the galaxy is opened. A *call tree* built once from the
+  trace (the calls, their parents, first and last step, steps spent) sets out a stable 3D layout,
+  so bubbles don't jump around while scrubbing. Each step only shows or hides bubbles and moves the
+  glow.
+- **Limits:** a run can have thousands of calls, so past a cap (~2,000 bubbles) repeated calls
+  collapse into one bubble labelled "×N".
+- **Tests:** unit tests for the call tree (nesting, step ranges, counts, collapsing), and checks
+  in the browser for readability, speed while scrubbing, and dark and light themes.

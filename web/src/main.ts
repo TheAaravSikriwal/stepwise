@@ -1,6 +1,6 @@
 // The playground page: editor, Run, and the debugger panels.
 
-import { embedded } from "./embed";
+import { currentTheme, embedded, forcedTheme, setTheme } from "./embed";
 import { createEditor } from "./editor/editor";
 import { EXAMPLES } from "./examples";
 import { DEMO_DEBUG, DEMO_SOURCE, createDemoReplay, createDemoStepIndex } from "./replay/demo";
@@ -117,7 +117,26 @@ async function runProgram(): Promise<void> {
 
 runButton.addEventListener("click", runProgram);
 
-// "More ways to move" closes after a choice, a click elsewhere, or Escape.
+// Light / dark. The button names the theme it switches to. A theme forced by
+// the URL (the wearechintu.com frame) can't be changed, so the button hides.
+const themeButton = $<HTMLButtonElement>("#theme-toggle");
+function labelThemeButton(): void {
+  const next = currentTheme() === "dark" ? "light" : "dark";
+  themeButton.textContent = next === "light" ? "☀ Light" : "☾ Dark";
+  themeButton.title = `Switch to the ${next} theme`;
+}
+if (forcedTheme) {
+  themeButton.hidden = true;
+} else {
+  labelThemeButton();
+  themeButton.addEventListener("click", () => {
+    setTheme(currentTheme() === "dark" ? "light" : "dark");
+    labelThemeButton();
+  });
+  matchMedia("(prefers-color-scheme: light)").addEventListener("change", labelThemeButton);
+}
+
+// "More moves" closes after a choice, a click elsewhere, or Escape.
 const more = $<HTMLDetailsElement>("details.more");
 more.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => (more.open = false)));
 document.addEventListener("click", (e) => {
