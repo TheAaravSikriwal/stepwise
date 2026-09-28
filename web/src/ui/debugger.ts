@@ -57,8 +57,8 @@ interface Explanation {
 
 const TIPS = [
   "Tip: press → on your keyboard for the next step, and ← to go back.",
-  "Tip: the yellow line is the one about to run. Nothing on it has happened yet.",
-  "Tip: variables highlighted in yellow were just made or changed.",
+  "Tip: the gold line is the one about to run. Nothing on it has happened yet.",
+  "Tip: variables highlighted in gold were just made or changed.",
   "Tip: drag the slider to move through the whole run at once.",
   "Tip: click just left of a line number to put a stop there. Then use More moves to jump to it.",
 ];
@@ -120,7 +120,7 @@ export class Debugger {
         "Press ▶ Run to start your program.",
         "Then press Next step to go through it one line at a time, and watch what each line does.",
       ],
-      tip: "Tip: open the examples menu at the top to try a ready-made program.",
+      tip: "Tip: open the examples menu above your code to try a ready-made program.",
     });
   }
 
@@ -210,6 +210,7 @@ export class Debugger {
     this.setEnabled(false);
     this.el.stepLabel.textContent = "";
     this.el.timeline.value = "0";
+    this.el.timeline.style.setProperty("--p", "0%");
     for (const l of this.listeners) l(null, null);
   }
 
@@ -243,7 +244,7 @@ export class Debugger {
 
   /**
    * "Where from?": jumps to the moment a variable got its current value,
-   * marks the line that set it in blue, and says so in the explainer.
+   * outlines the line that set it, and says so in the explainer.
    */
   whereFrom(frameIndex: number, varId: number): void {
     const s = this.session;
@@ -294,6 +295,7 @@ export class Debugger {
       ? `${s.endMessage ? "Stopped" : "Finished"} · ${count(last)} steps`
       : `Step ${count(st.step + 1)} of ${count(last)}`;
     this.el.timeline.value = String(st.step);
+    this.el.timeline.style.setProperty("--p", `${last > 0 ? (st.step / last) * 100 : 0}%`);
     this.el.toStart.disabled = this.el.back.disabled = this.el.prevBreak.disabled = st.step === 0;
     this.el.forward.disabled = this.el.toEnd.disabled = this.el.nextBreak.disabled = atEnd;
 
@@ -314,7 +316,7 @@ export class Debugger {
       this.explain({
         tone: "step",
         label: `Where \`${name}\` came from`,
-        lines: [`${where} ${how}. It's marked in blue.`, ...n.happened],
+        lines: [`${where} ${how}. It's the outlined line in your code.`, ...n.happened],
         next: n.next,
         tip: "Press Next step or Back to carry on from here.",
       });
@@ -415,24 +417,26 @@ export class Debugger {
       );
       return;
     }
-    const nodes: Node[] = [];
-    if (st.frames.length > 1) {
-      nodes.push(
-        rich(
-          "p",
-          `Showing \`${frame.name}\`'s variables. Click a function under Functions running to see another one's.`,
-          "vars-caption",
-        ),
-      );
-    }
+    // Which call's variables these are, and at which moment.
+    const caption = rich("p", `\`${frame.name}\`'s variables at `, "vars-caption");
+    caption.append(el("span", "at", `step ${(st.step + 1).toLocaleString("en-US")}`), ".");
+    if (st.frames.length > 1) caption.append(" Click a function under Functions running to see another one's.");
+    const nodes: Node[] = [caption];
     if (frame.vars.length === 0) {
       nodes.push(rich("div", `\`${frame.name}\` hasn't made any variables yet.`, "notice"));
       this.el.vars.replaceChildren(...nodes);
       return;
     }
     const table = document.createElement("table");
+    const head = table.createTHead().insertRow();
+    for (const label of ["Name", "Value", ""]) {
+      const th = document.createElement("th");
+      th.textContent = label;
+      head.append(th);
+    }
+    const body = table.createTBody();
     for (const v of frame.vars) {
-      const row = table.insertRow();
+      const row = body.insertRow();
       if (st.changed.has(varKey(this.selectedFrame, v.varId))) {
         row.className = "changed";
         row.title = "Just made or changed by the last step";

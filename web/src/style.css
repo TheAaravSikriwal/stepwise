@@ -1,12 +1,16 @@
-/* Stepwise's look: "Electric". A GitHub-dark style editor with cobalt/blue
- * for actions and yellow for "now", plus a matching light version.
+/* Stepwise's look: black, white and gold.
+ *
+ * Nothing sits in a box. The parts of the page float on one dark field,
+ * set apart by space and type rather than borders, and the only lines are
+ * thin gold rules that fade out. Over the call galaxy, the panels become
+ * frosted glass, so the map shows through blurred and the values stay the
+ * thing you read.
  *
  * Each colour means one thing:
- *   blue    = something you can do (Run, links, the selected function)
- *   yellow  = now (the line about to run, what just changed)
+ *   gold    = now (the line about to run, what just changed, the call running)
+ *             and the one thing to do (Run)
+ *   white   = where a value came from ("where from?")
  *   red     = a problem
- * Nothing is sharp: rounded cards with space between them, pill buttons,
- * and soft transitions.
  *
  * Every colour is written once as light-dark(light, dark). The page follows
  * the computer's setting (color-scheme: light dark); a choice from the theme
@@ -16,53 +20,70 @@
 :root {
   color-scheme: light dark;
 
-  --bg: light-dark(#f6f8fa, #0d1117);
-  --panel: light-dark(#ffffff, #161b22);
-  --panel-2: light-dark(#f6f8fa, #1c2128);
-  --border: light-dark(#d0d7de, #30363d);
-  --border-soft: light-dark(#e4e8ec, #21262d);
-  --text: light-dark(#1f2328, #e6edf3);
-  --muted: light-dark(#59636e, #8b949e);
-  --accent: light-dark(#0969da, #2f81f7);
-  --accent-hover: light-dark(#0550ae, #58a6ff);
-  --accent-soft: light-dark(rgba(9, 105, 218, 0.12), rgba(47, 129, 247, 0.18));
-  --on-accent: #ffffff;
-  --yellow: #ffd100;
-  --on-yellow: #1f1a00;
-  --now-soft: light-dark(#fff5c2, rgba(255, 209, 0, 0.12));
-  --now-strong: light-dark(#ffe266, rgba(255, 209, 0, 0.3));
-  --now-edge: light-dark(#d4a72c, #ffd100);
-  --error: light-dark(#cf222e, #f85149);
-  --error-soft: light-dark(#ffebe9, rgba(248, 81, 73, 0.12));
-  --shadow: light-dark(0 1px 2px rgba(31, 35, 40, 0.06), 0 1px 2px rgba(0, 0, 0, 0.4));
-  --shadow-pop: light-dark(0 8px 24px rgba(140, 149, 159, 0.25), 0 8px 24px rgba(1, 4, 9, 0.75));
+  --bg: light-dark(#f8f6f1, #060607);
+  --text: light-dark(#141312, #f4f1ea);
+  --muted: light-dark(#6f6a60, #948e83);
+  --faint: light-dark(#a39d91, #5d5850);
+  --hover: light-dark(rgba(20, 19, 18, 0.05), rgba(244, 241, 234, 0.06));
+  --hover-strong: light-dark(rgba(20, 19, 18, 0.09), rgba(244, 241, 234, 0.1));
+
+  --gold: light-dark(#a8841f, #d4af37);
+  --gold-bright: light-dark(#c9a227, #f1d27a);
+  /* Deeper on light paper, so it still reads. */
+  --gold-1: light-dark(#d9b64a, #f7e7a1);
+  --gold-2: light-dark(#b08a22, #d4af37);
+  --gold-3: light-dark(#7a5c12, #a97f24);
+  --gold-grad: linear-gradient(135deg, var(--gold-1) 0%, var(--gold-2) 42%, var(--gold-3) 100%);
+  --on-gold: #15110a;
+  --gold-soft: light-dark(rgba(168, 132, 31, 0.1), rgba(212, 175, 55, 0.1));
+  --gold-glow: light-dark(rgba(168, 132, 31, 0.22), rgba(212, 175, 55, 0.28));
+
+  --now-soft: light-dark(rgba(201, 162, 39, 0.14), rgba(212, 175, 55, 0.11));
+  --now-strong: light-dark(rgba(201, 162, 39, 0.3), rgba(212, 175, 55, 0.28));
+  --now-edge: var(--gold);
+  --origin-soft: light-dark(rgba(20, 19, 18, 0.06), rgba(244, 241, 234, 0.07));
+  --origin-edge: var(--text);
+  --error: light-dark(#b42318, #f0766b);
+  --error-soft: light-dark(rgba(180, 35, 24, 0.07), rgba(240, 118, 107, 0.09));
+
+  /* Frosted glass, for anything floating over the galaxy. */
+  --glass: light-dark(rgba(248, 246, 241, 0.62), rgba(8, 8, 10, 0.5));
+  --pop: light-dark(rgba(255, 255, 255, 0.92), rgba(18, 18, 20, 0.9));
+  --shadow-pop: light-dark(0 18px 50px rgba(40, 32, 12, 0.16), 0 18px 50px rgba(0, 0, 0, 0.65));
 
   /* Code, coloured by what kind of code it is (src/editor/language.ts). */
-  --syn-declare: light-dark(#cf222e, #ff7b72);
-  --syn-control: light-dark(#bf3989, #f778ba);
-  --syn-function: light-dark(#8250df, #d2a8ff);
-  --syn-builtin: light-dark(#116329, #7ee787);
-  --syn-param: light-dark(#953800, #ffa657);
-  --syn-variable-def: light-dark(#0550ae, #79c0ff);
-  --syn-variable: light-dark(#1f2328, #e6edf3);
-  --syn-type: light-dark(#0a7a6e, #56d4bc);
-  --syn-number: light-dark(#0550ae, #a5d6ff);
-  --syn-bool: light-dark(#0a7a6e, #56d4dd);
-  --syn-operator: light-dark(#59636e, #c9d1d9);
-  --syn-punctuation: light-dark(#59636e, #8b949e);
-  --syn-comment: light-dark(#6e7781, #8b949e);
+  --syn-declare: light-dark(#9a7818, #d4af37);
+  --syn-control: light-dark(#7a5c12, #f1d27a);
+  --syn-function: light-dark(#5c4a1e, #e8d5a3);
+  --syn-function-def: light-dark(#141312, #ffffff);
+  --syn-builtin: light-dark(#8a6d2a, #c9b37e);
+  --syn-param: light-dark(#5f5a52, #c4beb2);
+  --syn-variable-def: light-dark(#141312, #ffffff);
+  --syn-variable: light-dark(#2a2723, #e6e1d6);
+  --syn-type: light-dark(#8b6a3a, #b8925e);
+  --syn-number: light-dark(#a8841f, #f1d27a);
+  --syn-bool: light-dark(#a8841f, #f1d27a);
+  --syn-operator: light-dark(#6f6a60, #a39d91);
+  --syn-punctuation: light-dark(#8f897e, #6d685f);
+  --syn-comment: light-dark(#9a948a, #6d685f);
 
-  --radius: 14px;
-  --radius-sm: 10px;
+  --radius: 18px;
+  --radius-sm: 12px;
   --pill: 999px;
-  --gap: 10px;
+  --gap: 14px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 
-  --ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --ui: "Inter", "Segoe UI Variable Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --display: "Didot", "Bodoni 72", "Playfair Display", "Cormorant Garamond", Georgia, "Times New Roman", serif;
   --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
   font-family: var(--ui);
-  background: var(--bg);
   color: var(--text);
+  /* A faint gold light at the edges of the dark: the "space" it all floats in. */
+  background:
+    radial-gradient(1100px 620px at 12% -12%, light-dark(rgba(201, 162, 39, 0.1), rgba(212, 175, 55, 0.08)), transparent 70%),
+    radial-gradient(900px 600px at 105% 110%, light-dark(rgba(201, 162, 39, 0.08), rgba(212, 175, 55, 0.06)), transparent 70%),
+    var(--bg);
+  background-attachment: fixed;
 }
 
 :root[data-theme="light"] {
@@ -83,7 +104,24 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--gap);
-  padding: var(--gap);
+  padding: 12px 22px 18px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Everything sits above the galaxy layer. */
+body > :not(#galaxy) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Thin, quiet scrollbars. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--hover-strong) transparent;
+}
+
+::selection {
+  background: var(--now-strong);
 }
 
 /* Code everywhere shows exactly the keys to press: `<=` and `->`, never the
@@ -102,36 +140,46 @@ code {
   font-size: 0.92em;
 }
 
-.card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-
 /* --------------------------------------------------------------- buttons -- */
 
 button,
 select,
 .more summary {
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 500;
   color: var(--text);
-  background: var(--panel-2);
-  border: 1px solid var(--border);
+  background: var(--hover);
+  border: 1px solid transparent;
   border-radius: var(--pill);
-  padding: 0.42rem 0.95rem;
+  padding: 0.46rem 1rem;
   cursor: pointer;
   max-width: 100%;
-  transition: background 160ms var(--ease), border-color 160ms var(--ease), box-shadow 160ms var(--ease),
-    color 160ms var(--ease), transform 120ms var(--ease);
+  white-space: nowrap;
+  transition: background 200ms var(--ease), color 200ms var(--ease), box-shadow 200ms var(--ease),
+    transform 140ms var(--ease), opacity 200ms var(--ease);
+}
+
+select {
+  appearance: none;
+  padding-right: 2rem;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 1.05rem) 55%, calc(100% - 0.75rem) 55%;
+  background-size: 0.3rem 0.3rem;
+  background-repeat: no-repeat;
+  background-color: var(--hover);
+}
+
+select option {
+  background: var(--bg);
+  color: var(--text);
 }
 
 button:hover:not(:disabled),
 select:hover,
 .more summary:hover {
-  border-color: var(--accent);
+  background-color: var(--hover-strong);
 }
 
 button:active:not(:disabled) {
@@ -145,108 +193,147 @@ input:focus-visible,
 .frame:focus-visible,
 a:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 1px var(--accent);
+  box-shadow: 0 0 0 3px var(--gold-glow), 0 0 0 1px var(--gold);
 }
 
 button:disabled {
-  color: var(--muted);
-  opacity: 0.55;
+  opacity: 0.35;
   cursor: default;
 }
 
-/* The one thing to do first. */
+/* The one thing to do first: gold. */
 button.run {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
-  font-weight: 600;
-  font-size: 1rem;
-  padding: 0.55rem 1.4rem;
+  background: var(--gold-grad);
+  color: var(--on-gold);
+  font-weight: 650;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+  padding: 0.6rem 1.55rem;
+  box-shadow: 0 6px 24px var(--gold-glow), inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
 button.run:hover:not(:disabled) {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-  box-shadow: 0 0 0 4px var(--accent-soft);
+  background: var(--gold-grad);
+  box-shadow: 0 8px 32px var(--gold-glow), 0 0 0 4px var(--gold-soft), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-/* The one thing to do next, once it has run. */
+/* The one thing to do next, once it has run: the brightest thing but Run. */
 button.next:not(:disabled) {
-  background: var(--yellow);
-  border-color: var(--yellow);
-  color: var(--on-yellow);
+  background: var(--text);
+  color: var(--bg);
   font-weight: 600;
 }
 
 button.next:hover:not(:disabled) {
-  box-shadow: 0 0 0 4px rgba(255, 209, 0, 0.28);
+  background: var(--text);
+  box-shadow: 0 0 0 4px var(--hover-strong);
 }
 
 button.quiet {
   background: transparent;
+  color: var(--muted);
+}
+
+button.quiet:hover:not(:disabled) {
+  color: var(--text);
 }
 
 /* ---------------------------------------------------------------- topbar -- */
 
+/* Name on the left, the two views in the middle, the rest on the right. */
 .topbar {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 0.6rem 0.9rem;
-  padding: 0.55rem 0.9rem;
+  gap: 1rem;
+  padding: 6px 0 2px;
 }
 
 .brand {
-  margin: 0 0.4rem 0 0.2rem;
-  font-family: var(--mono);
-  font-size: 1.1rem;
-  font-weight: 600;
+  margin: 0;
+  justify-self: start;
+  font-family: var(--display);
+  font-size: 1.7rem;
+  font-weight: 500;
   letter-spacing: 0.01em;
+  line-height: 1;
 }
 
 .brand a {
-  color: inherit;
   text-decoration: none;
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* "Your code" | "Call galaxy": big, so it's clear there are two ways to look. */
+.views {
+  grid-column: 2;
+  display: flex;
+  gap: 4px;
+  padding: 5px;
+  border-radius: var(--pill);
+  background: var(--hover);
+}
+
+.views button {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-}
-
-/* A small yellow dot: the brand's "now". */
-.brand a::before {
-  content: "";
-  width: 0.6rem;
-  height: 0.6rem;
-  border-radius: 50%;
-  background: var(--yellow);
-  box-shadow: 0 0 0 3px rgba(255, 209, 0, 0.22);
-}
-
-.share-status {
-  font-size: 0.85rem;
+  gap: 0.55rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.7rem 1.7rem;
+  background: transparent;
   color: var(--muted);
+}
+
+.views button:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.views button[aria-selected="true"],
+.views button[aria-selected="true"]:hover {
+  background: var(--gold-grad);
+  color: var(--on-gold);
+  box-shadow: 0 6px 26px var(--gold-glow), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.view-icon {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
+.topbar-end {
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .topbar nav {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  margin-left: auto;
+  gap: 0.2rem;
 }
 
 .topbar nav a {
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 500;
   text-decoration: none;
-  padding: 0.35rem 0.75rem;
+  padding: 0.4rem 0.8rem;
   border-radius: var(--pill);
-  transition: background 160ms var(--ease), color 160ms var(--ease);
+  transition: background 200ms var(--ease), color 200ms var(--ease);
 }
 
 .topbar nav a:hover {
   color: var(--text);
-  background: var(--panel-2);
+  background: var(--hover);
 }
 
 /* --------------------------------------------------------------- toolbar -- */
@@ -255,28 +342,87 @@ button.quiet {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.6rem 1rem;
-  padding: 0.6rem 0.9rem;
+  gap: 0.6rem 1.1rem;
+  padding: 4px 0;
 }
 
 .stepper {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
 }
 
+/* Above the code: open an example, or share what's written. */
+.code-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0 0.5rem;
+}
+
+.code-head #share {
+  margin-left: auto;
+}
+
+.code-head .share-status {
+  margin-left: auto;
+}
+
+.code-head .share-status:empty {
+  display: none;
+}
+
+.code-head .share-status:not(:empty) + #share {
+  margin-left: 0;
+}
+
+.share-status {
+  font-size: 0.82rem;
+  color: var(--gold);
+}
+
+/* The timeline: a hairline that fills with gold as the run goes on. */
 #timeline {
-  width: 9rem;
-  accent-color: var(--accent);
+  --p: 0%;
+  appearance: none;
+  width: 11rem;
+  height: 4px;
+  margin: 0 0.4rem;
+  border-radius: var(--pill);
+  background: linear-gradient(90deg, var(--gold) var(--p), var(--hover-strong) var(--p));
+  cursor: pointer;
+}
+
+#timeline:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+#timeline::-webkit-slider-thumb {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--gold-grad);
+  box-shadow: 0 0 0 4px var(--gold-soft), 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+#timeline::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border: none;
+  border-radius: 50%;
+  background: var(--gold-grad);
+  box-shadow: 0 0 0 4px var(--gold-soft);
 }
 
 .step-label {
   font-family: var(--mono);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
-  min-width: 6.5rem;
+  min-width: 7rem;
 }
 
 /* "More moves": the advanced moves, each explained in words. */
@@ -305,17 +451,18 @@ button.quiet {
 .more .menu {
   position: absolute;
   z-index: 10;
-  top: calc(100% + 0.5rem);
-  right: 0;
-  width: min(22rem, 90vw);
+  top: calc(100% + 0.6rem);
+  left: 0;
+  width: min(23rem, 90vw);
   display: grid;
-  gap: 0.35rem;
+  gap: 0.2rem;
   padding: 0.5rem;
-  background: var(--panel);
-  border: 1px solid var(--border);
+  background: var(--pop);
+  backdrop-filter: blur(24px) saturate(1.3);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
   border-radius: var(--radius);
   box-shadow: var(--shadow-pop);
-  animation: pop-in 160ms var(--ease);
+  animation: pop-in 180ms var(--ease);
 }
 
 @keyframes pop-in {
@@ -327,17 +474,16 @@ button.quiet {
 
 .menu button {
   display: grid;
+  white-space: normal;
   gap: 0.15rem;
   text-align: left;
   border-radius: var(--radius-sm);
-  border-color: transparent;
   background: transparent;
-  padding: 0.55rem 0.7rem;
+  padding: 0.6rem 0.75rem;
 }
 
 .menu button:hover:not(:disabled) {
-  background: var(--panel-2);
-  border-color: var(--border-soft);
+  background: var(--hover);
 }
 
 .menu button span {
@@ -347,32 +493,40 @@ button.quiet {
 }
 
 .menu-hint {
-  margin: 0.2rem 0.6rem 0.3rem;
+  margin: 0.3rem 0.75rem 0.35rem;
   font-size: 0.8rem;
   color: var(--muted);
 }
 
 /* ------------------------------------------------------ what just happened -- */
 
+/* No box: a thin gold line down the left, fading out, is all that marks it. */
 .explain {
-  padding: 0.75rem 1rem 0.8rem 1.25rem;
-  min-height: 5.5rem;
-  /* The yellow edge is an inset shadow, so it follows the rounded corners. */
-  box-shadow: inset 4px 0 0 var(--yellow), var(--shadow);
+  padding: 0.35rem 0.5rem 0.4rem 1.35rem;
+  min-height: 5.2rem;
 }
 
-.explain[data-tone="problem"] {
-  background: var(--error-soft);
-  border-color: color-mix(in srgb, var(--error) 45%, transparent);
-  box-shadow: inset 4px 0 0 var(--error), var(--shadow);
+.explain::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--gold), transparent);
+}
+
+.explain[data-tone="problem"]::before {
+  background: linear-gradient(180deg, var(--error), transparent);
 }
 
 .explain-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--gold);
 }
 
 .explain[data-tone="problem"] .explain-label {
@@ -380,15 +534,15 @@ button.quiet {
 }
 
 .explain-lines {
-  margin: 0.3rem 0 0;
+  margin: 0.35rem 0 0;
   padding: 0;
   list-style: none;
-  font-size: 1.02rem;
+  font-size: 1.06rem;
   line-height: 1.55;
 }
 
 .explain-lines li {
-  animation: rise-in 220ms var(--ease) both;
+  animation: rise-in 260ms var(--ease) both;
 }
 
 .explain-lines li:nth-child(2) {
@@ -410,7 +564,8 @@ button.quiet {
 .explain-next code,
 .vars-caption code,
 .notice code {
-  background: var(--now-soft);
+  color: var(--gold-bright);
+  background: var(--gold-soft);
   border-radius: 6px;
   padding: 0.05em 0.35em;
 }
@@ -422,24 +577,24 @@ button.quiet {
 
 .explain-next::before {
   content: "→ ";
-  color: var(--accent);
+  color: var(--gold);
 }
 
 .explain-action {
-  margin-top: 0.55rem;
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
+  margin-top: 0.6rem;
+  background: var(--gold-grad);
+  color: var(--on-gold);
+  font-weight: 600;
 }
 
 .explain-action:hover:not(:disabled) {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
+  background: var(--gold-grad);
+  box-shadow: 0 0 0 4px var(--gold-soft);
 }
 
 .explain-tip {
   margin: 0.35rem 0 0;
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   color: var(--muted);
 }
 
@@ -454,13 +609,19 @@ main {
   flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  gap: var(--gap);
+  gap: calc(var(--gap) * 2);
+  min-height: 0;
+}
+
+.code-view {
+  display: flex;
+  flex-direction: column;
   min-height: 0;
 }
 
 .side {
   display: grid;
-  grid-template-rows: minmax(7rem, 1fr) minmax(6rem, 1fr) auto;
+  grid-template-rows: minmax(9rem, 1.4fr) minmax(5rem, 0.8fr) auto;
   gap: var(--gap);
   min-height: 0;
 }
@@ -470,29 +631,51 @@ main {
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+  border-radius: var(--radius);
+  transition: background 300ms var(--ease);
 }
 
+/* Each panel's name sits over its contents, with a gold rule that fades,
+   so it's clear what's under it. */
 .panel h2 {
   margin: 0;
-  padding: 0.6rem 1rem 0.5rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
+  padding: 0.55rem 0.9rem 0.6rem;
+  font-size: 0.74rem;
+  font-weight: 650;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--gold);
+  position: relative;
+}
+
+.panel h2::after {
+  content: "";
+  position: absolute;
+  left: 0.9rem;
+  right: 0.9rem;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent 75%);
+  opacity: 0.55;
 }
 
 .panel h2 .sub {
-  margin-left: 0.4rem;
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
   font-weight: 400;
   letter-spacing: 0;
   text-transform: none;
+  color: var(--muted);
+}
+
+.panel h2 .sub code {
+  font-size: 0.95em;
 }
 
 .vars,
 .stack,
 .output {
-  padding: 0.2rem 0.75rem 0.75rem;
+  padding: 0.6rem 0.9rem 0.8rem;
   overflow: auto;
 }
 
@@ -501,35 +684,60 @@ main {
   margin: 0;
   font-family: var(--mono);
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.6;
   white-space: pre-wrap;
-  padding-inline: 1rem;
 }
 
 .notice {
   color: var(--muted);
   font-family: var(--ui);
   font-size: 0.9rem;
-  line-height: 1.45;
-  padding: 0 0.25rem;
+  line-height: 1.5;
 }
 
 .error {
   color: var(--error);
 }
 
+/* "`hanoi`'s variables at step 162": which call, and which moment. */
+.vars-caption {
+  margin: 0 0 0.5rem;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.vars-caption .at {
+  color: var(--text);
+  font-weight: 600;
+}
+
 .vars table {
   border-collapse: separate;
-  border-spacing: 0 3px;
+  border-spacing: 0 2px;
   width: 100%;
   font-family: var(--mono);
   font-size: 14px;
 }
 
+.vars th {
+  padding: 0 0.7rem 0.3rem;
+  font-family: var(--ui);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--faint);
+}
+
 .vars td {
-  padding: 0.35rem 0.6rem;
-  background: var(--panel-2);
-  transition: background 200ms var(--ease);
+  padding: 0.4rem 0.7rem;
+  transition: background 240ms var(--ease);
+}
+
+.vars tr:hover td {
+  background: var(--hover);
 }
 
 .vars td:first-child {
@@ -540,6 +748,7 @@ main {
 
 .vars td:nth-child(2) {
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .vars td:last-child {
@@ -551,31 +760,30 @@ main {
 /* "where from?": quiet until you point at its row. */
 .where-from {
   font-family: var(--ui);
-  font-size: 0.75rem;
-  padding: 0.12rem 0.55rem;
+  font-size: 0.74rem;
+  padding: 0.14rem 0.6rem;
   white-space: nowrap;
   color: var(--muted);
   background: transparent;
-  border-color: var(--border-soft);
-  opacity: 0.7;
+  opacity: 0.55;
 }
 
 .vars tr:hover .where-from,
 .where-from:focus-visible {
   opacity: 1;
-  color: var(--accent);
-  border-color: var(--accent);
+  color: var(--gold);
+  background: var(--gold-soft);
 }
 
-/* Just made or changed: yellow, fading from bright to soft. */
+/* Just made or changed: gold, fading from bright to soft. */
 .vars tr.changed td {
   background: var(--now-soft);
-  animation: flash 700ms var(--ease);
+  animation: flash 800ms var(--ease);
 }
 
 .vars tr.changed td:first-child {
   color: var(--text);
-  box-shadow: inset 3px 0 0 var(--now-edge);
+  box-shadow: inset 2px 0 0 var(--now-edge);
 }
 
 @keyframes flash {
@@ -584,16 +792,10 @@ main {
   }
 }
 
-.vars-caption {
-  margin: 0 0.25rem 0.5rem;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
 .stack {
-  max-height: 11rem;
+  max-height: 9.5rem;
   display: grid;
-  gap: 0.35rem;
+  gap: 2px;
   align-content: start;
 }
 
@@ -602,31 +804,41 @@ main {
   grid-template-columns: auto auto 1fr;
   align-items: baseline;
   gap: 0.6rem;
-  padding: 0.4rem 0.7rem;
-  background: var(--panel-2);
-  border: 1px solid var(--border-soft);
+  padding: 0.42rem 0.7rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: border-color 160ms var(--ease), background 160ms var(--ease);
+  transition: background 200ms var(--ease);
 }
 
 .frame:hover {
-  border-color: var(--border);
-}
-
-.frame.current {
-  border-color: var(--now-edge);
+  background: var(--hover);
 }
 
 .frame.selected {
-  background: var(--accent-soft);
-  border-color: var(--accent);
+  background: var(--gold-soft);
 }
 
 .frame .fn {
   font-family: var(--mono);
   font-weight: 600;
   color: var(--syn-function);
+}
+
+/* A gold dot on the call running now. */
+.frame .fn::before {
+  content: "";
+  display: inline-block;
+  width: 0.42rem;
+  height: 0.42rem;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  vertical-align: 0.12em;
+  background: var(--faint);
+}
+
+.frame.current .fn::before {
+  background: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft), 0 0 10px var(--gold);
 }
 
 .frame .where {
@@ -637,44 +849,22 @@ main {
 
 .frame .role {
   justify-self: end;
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   color: var(--muted);
 }
 
 .frame.current .role {
-  color: var(--text);
+  color: var(--gold);
   font-weight: 600;
 }
 
-/* ------------------------------------------- "Your code" | "Call galaxy" -- */
+/* ---------------------------------------------------------- the galaxy -- */
 
-.tabs {
-  display: flex;
-  gap: 4px;
-  padding: 0.45rem 0.6rem 0.35rem;
-}
-
-.tabs button {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 0.3rem 0.85rem;
-  background: transparent;
-  border-color: transparent;
-  color: var(--muted);
-}
-
-.tabs button[aria-selected="true"] {
-  background: var(--accent-soft);
-  color: var(--text);
-}
-
+/* The whole page, behind everything. Only shown in the galaxy view. */
 .galaxy {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
 }
 
 .galaxy[hidden] {
@@ -682,15 +872,8 @@ main {
 }
 
 .galaxy-stage {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  margin: 0 0.6rem;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background:
-    radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%),
-    var(--panel-2);
+  position: absolute;
+  inset: 0;
 }
 
 .galaxy-stage canvas,
@@ -712,46 +895,53 @@ main {
   pointer-events: none;
   font-family: var(--mono);
   font-size: 12px;
-  padding: 1px 8px;
+  padding: 2px 9px;
   border-radius: var(--pill);
-  background: color-mix(in srgb, var(--panel) 80%, transparent);
-  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--text);
   white-space: nowrap;
 }
 
 .galaxy-label.now {
-  background: var(--yellow);
-  border-color: var(--yellow);
-  color: var(--on-yellow);
-  font-weight: 600;
+  background: var(--gold-grad);
+  color: var(--on-gold);
+  font-weight: 650;
+  box-shadow: 0 4px 18px var(--gold-glow);
 }
 
 .galaxy-tooltip {
   position: absolute;
   z-index: 2;
   pointer-events: none;
-  max-width: 18rem;
-  padding: 0.4rem 0.7rem;
+  max-width: 19rem;
+  padding: 0.45rem 0.8rem;
   border-radius: var(--radius-sm);
-  background: var(--panel);
-  border: 1px solid var(--border);
+  background: var(--pop);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   box-shadow: var(--shadow-pop);
   font-size: 0.82rem;
-  line-height: 1.4;
-}
-
-.galaxy-notice {
-  margin: 0;
-  padding: 2rem 1.5rem;
-  text-align: center;
-}
-
-.galaxy-legend {
-  padding: 0.5rem 1rem 0.7rem;
-  font-size: 0.82rem;
   line-height: 1.45;
+}
+
+/* The key, floating at the bottom left over the map. */
+.galaxy-legend {
+  position: absolute;
+  z-index: 2;
+  left: 22px;
+  bottom: 18px;
+  max-width: min(34rem, 52vw);
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius);
+  background: var(--glass);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  font-size: 0.82rem;
+  line-height: 1.5;
   color: var(--muted);
+  pointer-events: none;
 }
 
 .galaxy-legend p {
@@ -760,6 +950,58 @@ main {
 
 .galaxy-legend:empty {
   display: none;
+}
+
+.galaxy-notice {
+  position: absolute;
+  left: 22px;
+  right: calc(40% + 22px);
+  top: 55%;
+  margin: 0;
+  text-align: center;
+  font-size: 1rem;
+}
+
+/* The galaxy view: the map fills the page, the code steps aside, and the
+   panels turn to frosted glass, so the map under them blurs and the values
+   are what you read. */
+html[data-view="galaxy"] .code-view {
+  visibility: hidden;
+}
+
+html[data-view="galaxy"] main,
+html[data-view="galaxy"] .toolbar,
+html[data-view="galaxy"] .topbar,
+html[data-view="galaxy"] .explain {
+  pointer-events: none;
+}
+
+html[data-view="galaxy"] .toolbar > *,
+html[data-view="galaxy"] .topbar > *,
+html[data-view="galaxy"] .explain > *,
+html[data-view="galaxy"] .side {
+  pointer-events: auto;
+}
+
+html[data-view="galaxy"] .panel,
+html[data-view="galaxy"] .views {
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(1.25);
+  -webkit-backdrop-filter: blur(20px) saturate(1.25);
+}
+
+html[data-view="galaxy"] .explain {
+  align-self: flex-start;
+  max-width: 60%;
+  border-radius: var(--radius);
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding-right: 1.2rem;
+}
+
+html[data-view="galaxy"] .explain::before {
+  left: 0.55rem;
 }
 
 /* ---------------------------------------------------------------- editor -- */
@@ -772,7 +1014,7 @@ main {
 #editor .cm-editor {
   height: 100%;
   font-size: 15px;
-  background: var(--panel);
+  background: transparent;
   color: var(--text);
 }
 
@@ -782,41 +1024,42 @@ main {
 
 #editor .cm-scroller {
   font-family: var(--mono);
-  line-height: 1.65;
+  line-height: 1.7;
 }
 
 #editor .cm-gutters {
-  background: var(--panel);
-  color: var(--muted);
+  background: transparent;
+  color: var(--faint);
   border-right: none;
 }
 
 #editor .cm-activeLine {
-  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  background: var(--hover);
+  border-radius: 6px;
 }
 
 #editor .cm-activeLineGutter {
   background: transparent;
-  color: var(--text);
+  color: var(--gold);
 }
 
 #editor .cm-content {
-  caret-color: var(--accent);
+  caret-color: var(--gold);
 }
 
 #editor .cm-cursor {
-  border-left: 2px solid var(--accent);
+  border-left: 2px solid var(--gold);
 }
 
 #editor .cm-selectionBackground,
 #editor .cm-focused .cm-selectionBackground {
-  background: var(--accent-soft) !important;
+  background: var(--now-strong) !important;
 }
 
-/* The line about to run: yellow, the colour that always means "now". */
+/* The line about to run: gold, the colour that always means "now". */
 #editor .cm-stepLine {
-  background: var(--now-soft);
-  box-shadow: inset 3px 0 0 var(--now-edge);
+  background: linear-gradient(90deg, var(--now-soft), transparent 90%);
+  box-shadow: inset 2px 0 0 var(--now-edge);
 }
 
 #editor .cm-stepRange {
@@ -825,15 +1068,15 @@ main {
   box-shadow: 0 0 0 2px var(--now-strong);
 }
 
-/* The line a value came from ("where from?"): blue. */
+/* The line a value came from ("where from?"): white. */
 #editor .cm-originLine {
-  background: var(--accent-soft);
-  box-shadow: inset 3px 0 0 var(--accent);
+  background: linear-gradient(90deg, var(--origin-soft), transparent 90%);
+  box-shadow: inset 2px 0 0 var(--origin-edge);
 }
 
 #editor .cm-originRange {
   border-radius: 5px;
-  box-shadow: 0 0 0 1px var(--accent);
+  box-shadow: 0 0 0 1px var(--origin-edge);
 }
 
 /* Stops ("breakpoints"): click the gutter beside a line number. */
@@ -875,9 +1118,11 @@ main {
 }
 
 #editor .cm-tooltip {
+  border: none;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--panel);
+  background: var(--pop);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   box-shadow: var(--shadow-pop);
   overflow: hidden;
 }
@@ -888,6 +1133,21 @@ main {
   body {
     height: auto;
     min-height: 100vh;
+    padding-inline: 14px;
+  }
+
+  .topbar {
+    grid-template-columns: 1fr auto;
+  }
+
+  .topbar-end {
+    grid-column: 2;
+  }
+
+  .views {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: center;
   }
 
   main {
@@ -911,33 +1171,45 @@ main {
     width: 100%;
   }
 
-  .topbar nav {
-    margin-left: 0;
+  html[data-view="galaxy"] .code-view {
+    display: none;
+  }
+
+  html[data-view="galaxy"] .explain {
+    max-width: none;
+  }
+
+  .galaxy-legend {
+    display: none;
   }
 }
 
 /* ------------------------------------------ embedded in wearechintu.com -- */
 
-/* The host page has the title, nav and theme. */
+/* The host page has the title, nav and theme; the two views stay, centred. */
 html.embedded .topbar > h1,
-html.embedded .topbar > nav,
+html.embedded .topbar nav,
 html.embedded #theme-toggle,
 html.embedded body.doc > header {
   display: none;
 }
 
 html.embedded .topbar {
-  padding-block: 0.4rem;
+  padding-block: 0;
+}
+
+html.embedded .views button {
+  padding-block: 0.55rem;
 }
 
 /* The frame is only so tall: tighter spacing gives the code more room. */
 html.embedded body {
-  --gap: 6px;
+  --gap: 9px;
+  padding: 8px 14px 12px;
 }
 
 html.embedded .explain {
   min-height: 4.5rem;
-  padding-block: 0.55rem 0.6rem;
 }
 
 /* --------------------------------------- doc pages (language, how it works) -- */
@@ -951,114 +1223,114 @@ body.doc > header {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.55rem 0.9rem;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  padding: 8px 0;
 }
 
 body.doc > header h1 {
   margin: 0;
-  font-family: var(--mono);
-  font-size: 1.1rem;
+  font-family: var(--display);
+  font-size: 1.7rem;
+  font-weight: 500;
+  line-height: 1;
 }
 
 body.doc > header h1 a {
-  color: inherit;
   text-decoration: none;
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 body.doc > header nav {
   display: flex;
-  gap: 0.35rem;
+  gap: 0.2rem;
   margin-left: auto;
 }
 
 body.doc > header nav a {
   color: var(--muted);
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   text-decoration: none;
-  padding: 0.35rem 0.75rem;
+  padding: 0.4rem 0.8rem;
   border-radius: var(--pill);
 }
 
 body.doc > header nav a:hover {
   color: var(--text);
-  background: var(--panel-2);
+  background: var(--hover);
 }
 
 .doc-main {
   display: block;
-  padding: 1rem 0.5rem 4rem;
+  padding: 1.5rem 0.5rem 5rem;
 }
 
 article {
-  max-width: 46rem;
+  max-width: 44rem;
   margin: 0 auto;
-  padding: 1.5rem 2rem 2rem;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  line-height: 1.7;
+  line-height: 1.75;
   font-size: 1.05rem;
 }
 
 article h1 {
-  font-size: 1.9rem;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 2.6rem;
+  line-height: 1.15;
   margin-top: 0.4rem;
 }
 
 article h2 {
-  margin-top: 2.2rem;
-  font-size: 1.25rem;
+  margin-top: 2.6rem;
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
 }
 
 article code {
-  background: var(--panel-2);
-  border: 1px solid var(--border-soft);
+  background: var(--hover);
   border-radius: 6px;
   padding: 0.05rem 0.35rem;
 }
 
 article pre {
-  background: var(--panel-2);
-  border: 1px solid var(--border-soft);
+  background: var(--hover);
   border-radius: var(--radius-sm);
-  padding: 0.9rem 1rem;
+  padding: 1rem 1.15rem;
   overflow-x: auto;
 }
 
 article pre code {
   background: none;
-  border: none;
   padding: 0;
 }
 
 article table {
-  border-collapse: separate;
-  border-spacing: 0;
-  margin: 1rem 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
 }
 
 article th,
 article td {
-  border-bottom: 1px solid var(--border-soft);
-  padding: 0.45rem 0.7rem;
+  padding: 0.5rem 0.9rem;
   text-align: left;
 }
 
-article tr:last-child td {
-  border-bottom: none;
+article th {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
 }
 
-article th {
-  background: var(--panel-2);
+article tr + tr td {
+  border-top: 1px solid var(--hover-strong);
 }
 
 article a {
-  color: var(--accent);
+  color: var(--gold);
 }

@@ -3,22 +3,26 @@
 This project follows [semantic versioning](https://semver.org): 0.1 is the MVP, 1.0 is the
 public launch.
 
-## 0.2.0 (unreleased): Electric, "where from?", and the call galaxy
+## 0.2.0 (unreleased): black and gold, "where from?", and the call galaxy
 
 ### Added
-- **The call galaxy:** a "Call galaxy" tab beside "Your code" shows the whole run in 3D. Every
+- **The call galaxy:** a "Call galaxy" view beside "Your code" shows the whole run in 3D, filling
+  the page, with the panels floating over it as frosted glass. Every
   function call is a bubble (bigger means more steps ran in it), the calls it made sit around it,
-  and recursion curls into a chain. The call running now glows yellow, finished calls fade, and
+  and recursion curls into a chain. The call running now glows gold, finished calls fade, and
   the running calls' variables orbit as moons. Drag to look around, scroll to zoom, hover for
   details, click a bubble to jump there. It follows every step. Past 2,000 calls, later ones fold
-  into their callers. three.js loads only when the tab first opens.
-- **"Where from?"** on every variable: jumps to the step that gave it its value, marks that line in
-  blue, and says so ("Line 9 called `factorial` and passed in `n` = 3"). Exact under recursion.
+  into their callers. three.js loads only when the view first opens.
+- **"Where from?"** on every variable: jumps to the step that gave it its value, outlines that line,
+  and says so ("Line 9 called `factorial` and passed in `n` = 3"). Exact under recursion.
 - **Light and dark themes:** follows the computer's setting, with a toggle that's remembered.
 
 ### Changed
-- **The Electric look:** GitHub-dark colours, blue for actions, yellow for "now"; rounded cards,
-  pill buttons and soft transitions.
+- **Black, white and gold:** nothing sits in a box; the parts of the page float on one dark field
+  (or ivory, in the light theme), set apart by space and type. Gold means "now" and marks Run.
+  The name sits top left, and the two views ("Your code", "Call galaxy") are big buttons at the
+  top centre. The Variables panel says whose variables they are and at which step, under Name and
+  Value headings.
 - **Code is coloured by what it is:** declarations, control flow, functions where they're defined
   and where they're called, parameters, new variables, types, numbers, booleans, `print`,
   operators and comments.

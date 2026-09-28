@@ -115,11 +115,11 @@ export const stepwiseLanguage = StreamLanguage.define<HighlightState>({
 // Colours come from CSS variables, so the dark and light themes both work (style.css).
 const style = HighlightStyle.define([
   { tag: t.definitionKeyword, color: "var(--syn-declare)", fontWeight: "600" },
-  { tag: t.controlKeyword, color: "var(--syn-control)", fontWeight: "600" },
-  { tag: t.function(t.definition(t.variableName)), color: "var(--syn-function)", fontWeight: "700" },
+  { tag: t.controlKeyword, color: "var(--syn-control)", fontWeight: "600", fontStyle: "italic" },
+  { tag: t.function(t.definition(t.variableName)), color: "var(--syn-function-def)", fontWeight: "700" },
   { tag: t.function(t.variableName), color: "var(--syn-function)" },
   { tag: t.standard(t.variableName), color: "var(--syn-builtin)" },
-  { tag: paramTag, color: "var(--syn-param)" },
+  { tag: paramTag, color: "var(--syn-param)", fontStyle: "italic" },
   { tag: t.definition(t.variableName), color: "var(--syn-variable-def)", fontWeight: "600" },
   { tag: t.variableName, color: "var(--syn-variable)" },
   { tag: t.typeName, color: "var(--syn-type)" },

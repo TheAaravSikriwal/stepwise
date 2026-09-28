@@ -41,8 +41,8 @@ export interface Editor {
 
 /**
  * A highlight of one range and its line, set by an effect and cleared with
- * `null`. Two of them: the step about to run (yellow), and the line a value
- * came from (blue).
+ * `null`. Two of them: the step about to run (gold), and the line a value
+ * came from (outlined).
  */
 function rangeHighlight(lineClass: string, rangeClass: string) {
   const set = StateEffect.define<Range | null>();

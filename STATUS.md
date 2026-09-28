@@ -13,7 +13,7 @@ backwards, with a plain-English explanation of every step.
   errors (division by zero, recursion that never stops).
 - **Replay engine:** snapshots every 1,000 steps; any seek, in either direction, loads the nearest
   snapshot and replays forward. Fast on a million-event run.
-- **Playground:** the Electric look (dark and light), code coloured by kind. A "What just
+- **Playground:** black, white and gold (dark and light), nothing boxed in, code coloured by kind. A "What just
   happened" explainer for every step, "where from?" on every variable, the 3D call galaxy, variables with change highlights, functions running, output synced to the step,
   step / skip over / finish function / stops in both directions, a timeline, the example gallery,
   share links, and the language and "How it works" pages.

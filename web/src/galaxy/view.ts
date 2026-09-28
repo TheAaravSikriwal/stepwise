@@ -1,7 +1,7 @@
 // The call galaxy: the run as a 3D map. Every function call is a bubble,
 // the calls it made cluster around it, and the variables of each running
 // call orbit it as small moons. Bigger means more steps ran there. The call
-// running now glows yellow. Drag to look around, scroll to zoom, click a
+// running now glows gold. Drag to look around, scroll to zoom, click a
 // bubble to jump to that moment.
 //
 // Loaded only when the galaxy is opened (it pulls in three.js). The layout
@@ -15,12 +15,16 @@ import { currentTheme } from "../embed";
 import { type FrameView, varKey } from "../replay/types";
 import { type CallTree, type Phase, type Vec3, layout, phasesAt, radiusOf } from "./model";
 
-/** One colour per function, cycled; `main` always gets the first. Deeper shades on the light theme. */
+/**
+ * One colour per function, cycled; `main` always gets the first. Metals and
+ * pearl: ivory, silver, champagne, bronze, pewter, copper. Gold itself is
+ * kept for the call running now, so nothing else is mistaken for it.
+ */
 const PALETTES = {
-  dark: ["#58a6ff", "#d2a8ff", "#7ee787", "#ffa657", "#f778ba", "#56d4dd", "#ff7b72", "#a5d6ff"],
-  light: ["#0969da", "#8250df", "#1a7f37", "#bc4c00", "#bf3989", "#1b7c83", "#cf222e", "#54aeff"],
+  dark: ["#f4f1ea", "#c9c3b6", "#e8d5a3", "#b8925e", "#8f8a80", "#d9cfb8", "#a8744e", "#efe6d2"],
+  light: ["#1a1917", "#5f5a52", "#8b6a3a", "#6d5a2e", "#3a3631", "#9a8f7a", "#7a5230", "#2d2a26"],
 };
-const NOW = "#ffd100";
+const NOW = { dark: "#f1c84b", light: "#c9a227" };
 const MAX_MOONS = 400;
 /** Finished calls shrink back so the calls still running stand out. */
 const DONE_SCALE = 0.7;
@@ -54,6 +58,9 @@ export class GalaxyView {
   private last: Parameters<GalaxyView["update"]> | null = null;
   private muted = new THREE.Color();
   private moonColour = new THREE.Color();
+  private now = new THREE.Color(NOW.dark);
+  /** The open part of the page to centre the map in, in CSS pixels; null for the whole canvas. */
+  private focus: { x: number; y: number; width: number; height: number } | null = null;
 
   constructor(
     private readonly container: HTMLElement,
@@ -96,7 +103,6 @@ export class GalaxyView {
     // Bubbles: one instance per call, all in one draw.
     this.positions = layout(tree);
     this.baseColours = tree.nodes.map(() => new THREE.Color());
-    this.readTheme();
     this.bubbles = new THREE.InstancedMesh(
       new THREE.SphereGeometry(1, 32, 20),
       new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0.15, transparent: true, opacity: 0.93 }),
@@ -122,9 +128,10 @@ export class GalaxyView {
     // The glow around the call running now.
     this.glow = new THREE.Mesh(
       new THREE.SphereGeometry(1, 32, 20),
-      new THREE.MeshBasicMaterial({ color: NOW, transparent: true, opacity: 0.22, depthWrite: false }),
+      new THREE.MeshBasicMaterial({ color: NOW.dark, transparent: true, opacity: 0.2, depthWrite: false }),
     );
     this.scene.add(this.glow);
+    this.readTheme();
 
     // Moons: the running calls' variables.
     this.moons = new THREE.InstancedMesh(
@@ -154,6 +161,8 @@ export class GalaxyView {
     };
     this.muted.set(read("--muted"));
     this.moonColour.set(read("--text"));
+    this.now.set(NOW[theme]);
+    (this.glow.material as THREE.MeshBasicMaterial).color.copy(this.now);
     const palette = PALETTES[theme];
     this.tree.nodes.forEach((n, i) =>
       this.baseColours[i].set(i === 0 ? palette[0] : palette[(n.fnId % (palette.length - 1)) + 1]),
@@ -187,7 +196,7 @@ export class GalaxyView {
       const r = phases[i] === "waiting" ? 0 : phases[i] === "done" ? radiusOf(node) * DONE_SCALE : radiusOf(node);
       matrix.makeScale(r, r, r).setPosition(...this.positions[i]);
       this.bubbles.setMatrixAt(i, matrix);
-      if (i === current) colour.set(NOW);
+      if (i === current) colour.copy(this.now);
       else if (phases[i] === "running") colour.copy(this.baseColours[i]);
       else colour.copy(this.baseColours[i]).lerp(this.muted, 0.65);
       this.bubbles.setColorAt(i, colour);
@@ -245,10 +254,16 @@ export class GalaxyView {
     for (const p of this.positions) radius = Math.max(radius, centre.distanceTo(new THREE.Vector3(...p)) + 1);
     this.camera.far = radius * 12;
     this.camera.updateProjectionMatrix();
-    const d = radius * 1.9;
+    const d = radius * 2.4;
     this.camera.position.copy(centre).add(new THREE.Vector3(0.56, 0.35, 0.75).multiplyScalar(d));
     this.controls.target.copy(centre);
     this.controls.update();
+  }
+
+  /** Centres the map in part of the canvas (the rest is under the panels). */
+  setFocus(rect: { x: number; y: number; width: number; height: number } | null): void {
+    this.focus = rect;
+    this.resize();
   }
 
   private resize(): void {
@@ -257,6 +272,15 @@ export class GalaxyView {
     this.renderer.setSize(w, h);
     this.labels.setSize(w, h);
     this.camera.aspect = w / h;
+    // Shift the picture so the camera's centre lands in the middle of the
+    // open space. Picking and labels use the same projection, so they follow.
+    if (this.focus) {
+      const cx = this.focus.x + this.focus.width / 2;
+      const cy = this.focus.y + this.focus.height / 2;
+      this.camera.setViewOffset(w, h, w / 2 - cx, h / 2 - cy, w, h);
+    } else {
+      this.camera.clearViewOffset();
+    }
     this.camera.updateProjectionMatrix();
   }
 
@@ -314,9 +338,8 @@ export class GalaxyView {
       this.glow.visible = false;
     }
 
-    // Moons orbit their call; just-changed variables are yellow.
+    // Moons orbit their call; just-changed variables are gold.
     const matrix = new THREE.Matrix4();
-    const colour = new THREE.Color();
     let m = 0;
     for (const { node, vars } of this.orbits) {
       const [x, y, z] = this.positions[node];
@@ -327,7 +350,7 @@ export class GalaxyView {
         const size = v.changed ? 0.13 : 0.09;
         matrix.makeScale(size, size, size).setPosition(x + Math.cos(a) * orbit, y + Math.sin(a * 0.7) * 0.15, z + Math.sin(a) * orbit);
         this.moons.setMatrixAt(m, matrix);
-        this.moons.setColorAt(m, v.changed ? colour.set(NOW) : this.moonColour);
+        this.moons.setColorAt(m, v.changed ? this.now : this.moonColour);
         m++;
       });
     }
@@ -348,6 +371,7 @@ export class GalaxyView {
     this.resizeObserver.disconnect();
     this.controls.dispose();
     this.renderer.dispose();
+    this.renderer.forceContextLoss();
     this.scene.traverse((o) => {
       const mesh = o as THREE.Mesh;
       mesh.geometry?.dispose();

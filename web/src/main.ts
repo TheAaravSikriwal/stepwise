@@ -57,8 +57,9 @@ const galaxy = new GalaxyPanel(
   {
     codeTab: $<HTMLButtonElement>("#tab-code"),
     galaxyTab: $<HTMLButtonElement>("#tab-galaxy"),
-    code: $("#editor"),
     galaxy: $("#galaxy"),
+    side: $(".side"),
+    explain: $("#explain"),
   },
   debug,
 );

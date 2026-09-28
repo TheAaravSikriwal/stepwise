@@ -58,7 +58,7 @@ export function narrate(
     return { happened, next: null };
   }
   const where = cur.frames.length > 1 ? ` in ${code(cur.frames[cur.frames.length - 1].name)}` : "";
-  return { happened, next: `Next up: line ${lineOfStep(cur.line, ctx)}${where}, highlighted in yellow.` };
+  return { happened, next: `Next up: line ${lineOfStep(cur.line, ctx)}${where}, highlighted in gold.` };
 }
 
 function lineOfStep(step: number, ctx: NarrationContext): number {

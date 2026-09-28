@@ -23,7 +23,7 @@ describe("narrate: the demo loop, step by step", () => {
 
   it("starts by saying nothing has run, and where it begins", () => {
     expect(n[0].happened).toEqual(["Your program is ready to start. Nothing has run yet."]);
-    expect(n[0].next).toBe("Next up: line 2, highlighted in yellow.");
+    expect(n[0].next).toBe("Next up: line 2, highlighted in gold.");
   });
 
   it("names new variables with their values", () => {
@@ -97,7 +97,7 @@ describe("narrate: calls, returns, prints and errors", () => {
   it("says which function was called, with its arguments, and where we are now", () => {
     const n = narrate(inMain, inAdd, ctx);
     expect(n.happened).toEqual(["Called `add` with a = 2, b = 3."]);
-    expect(n.next).toBe("Next up: line 2 in `add`, highlighted in yellow.");
+    expect(n.next).toBe("Next up: line 2 in `add`, highlighted in gold.");
   });
 
   it("says a function finished, and what was printed", () => {

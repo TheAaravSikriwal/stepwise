@@ -8,19 +8,29 @@
     <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
-    <header class="topbar card">
+    <!-- The call galaxy fills the page behind everything when it's open. -->
+    <div id="galaxy" class="galaxy" role="tabpanel" aria-labelledby="tab-galaxy" hidden></div>
+
+    <header class="topbar">
       <h1 class="brand"><a href="./">Stepwise</a></h1>
-      <select id="examples" aria-label="Open an example program"></select>
-      <button id="share" type="button" class="quiet" title="Copy a link to this program, to send to someone">Share</button>
-      <span id="share-status" class="share-status" aria-live="polite"></span>
-      <button id="theme-toggle" type="button" class="quiet"></button>
-      <nav>
-        <a href="./language.html">The language</a>
-        <a href="./how-it-works.html">How it works</a>
-      </nav>
+      <div class="views" role="tablist" aria-label="What to show">
+        <button id="tab-code" type="button" role="tab" aria-selected="true" aria-controls="code-view">
+          <span class="view-icon" aria-hidden="true">{ }</span> Your code
+        </button>
+        <button id="tab-galaxy" type="button" role="tab" aria-selected="false" aria-controls="galaxy" title="See every function call in the run as a 3D map you can look around">
+          <span class="view-icon" aria-hidden="true">✦</span> Call galaxy
+        </button>
+      </div>
+      <div class="topbar-end">
+        <button id="theme-toggle" type="button" class="quiet"></button>
+        <nav>
+          <a href="./language.html">The language</a>
+          <a href="./how-it-works.html">How it works</a>
+        </nav>
+      </div>
     </header>
 
-    <section class="toolbar card" aria-label="Run and step through your program">
+    <section class="toolbar" aria-label="Run and step through your program">
       <button id="run" type="button" class="run" title="Run your program (Ctrl+Enter)">▶ Run</button>
 
       <div class="stepper" role="toolbar" aria-label="Step through your program">
@@ -56,31 +66,31 @@
       </div>
     </section>
 
-    <section id="explain" class="explain card" aria-live="polite"></section>
+    <section id="explain" class="explain" aria-live="polite"></section>
 
     <main>
-      <section class="panel card editor-panel">
-        <div class="tabs" role="tablist" aria-label="What to show">
-          <button id="tab-code" type="button" role="tab" aria-selected="true" aria-controls="editor">Your code</button>
-          <button id="tab-galaxy" type="button" role="tab" aria-selected="false" aria-controls="galaxy" title="See every function call in the run as a 3D map you can look around">Call galaxy</button>
+      <section id="code-view" class="code-view" role="tabpanel" aria-labelledby="tab-code">
+        <div class="code-head">
+          <select id="examples" aria-label="Open an example program"></select>
+          <span id="share-status" class="share-status" aria-live="polite"></span>
+          <button id="share" type="button" class="quiet" title="Copy a link to this program, to send to someone">Share ↗</button>
         </div>
-        <div id="editor" role="tabpanel" aria-labelledby="tab-code"></div>
-        <div id="galaxy" class="galaxy" role="tabpanel" aria-labelledby="tab-galaxy" hidden></div>
+        <div id="editor"></div>
       </section>
-      <div class="side">
-        <section class="panel card">
+      <aside class="side">
+        <section class="panel">
           <h2>Variables <span class="sub">their values right now</span></h2>
           <div id="vars" class="vars"></div>
         </section>
-        <section class="panel card">
+        <section class="panel">
           <h2>Output <span class="sub">what <code>print</code> showed, and any problems</span></h2>
           <pre id="output" class="output" aria-live="polite"></pre>
         </section>
-        <section class="panel card">
+        <section class="panel">
           <h2>Functions running <span class="sub">the newest on top</span></h2>
           <div id="stack" class="stack"></div>
         </section>
-      </div>
+      </aside>
     </main>
     <script type="module" src="./src/main.ts"></script>
   </body>

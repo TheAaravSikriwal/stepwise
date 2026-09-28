@@ -331,3 +331,17 @@ committed before the next.
   collapse into one bubble labelled "×N".
 - **Tests:** unit tests for the call tree (nesting, step ranges, counts, collapsing), and checks
   in the browser for readability, speed while scrubbing, and dark and light themes.
+
+### Stage D: black, white and gold (done 2026-09-27)
+Asked for after the galaxy: "no clear boundaries, everything floating in space", and a look that
+feels expensive.
+- **Colours:** black (#060607), warm white (#f4f1ea) and gold (#d4af37); an ivory light theme
+  with deeper gold. Gold means "now" (and marks Run); white outlines where a value came from; red
+  is still a problem.
+- **Structure:** no cards or borders. The name top left, the two views as big buttons top centre,
+  examples and Share just above the code. Panel names in gold capitals over a fading gold rule, so
+  it's clear what's under each.
+- **Galaxy view:** the map fills the page behind everything; the panels turn to frosted glass
+  over it, so the map under them blurs and the values stay the thing you read. The camera centres
+  the map in the open space left of the panels (`GalaxyView.setFocus`).
+- **Variables:** "`fib`'s variables at step 85", with Name and Value headings.

@@ -1,6 +1,8 @@
-// The "Call galaxy" tab beside "Your code". It follows the debugger: every
-// step moves the galaxy to that moment, and clicking a bubble moves the
-// debugger there. three.js is only fetched the first time the tab opens.
+// The "Call galaxy" view, beside "Your code". The map fills the whole page
+// behind the panels (the page's CSS turns them to frosted glass when
+// html[data-view="galaxy"]). It follows the debugger: every step moves the
+// galaxy to that moment, and clicking a bubble moves the debugger there.
+// three.js is only fetched the first time the view opens.
 
 import type { ReplayState } from "../replay/types";
 import type { TraceData } from "../runtime/trace";
@@ -11,8 +13,10 @@ import type { GalaxyView } from "./view";
 interface Elements {
   codeTab: HTMLButtonElement;
   galaxyTab: HTMLButtonElement;
-  code: HTMLElement;
   galaxy: HTMLElement;
+  /** The panels over the map, so the map can centre in the space left over. */
+  side: HTMLElement;
+  explain: HTMLElement;
 }
 
 export class GalaxyPanel {
@@ -39,6 +43,7 @@ export class GalaxyPanel {
 
     el.codeTab.addEventListener("click", () => this.show(false));
     el.galaxyTab.addEventListener("click", () => this.show(true));
+    addEventListener("resize", () => this.refocus());
     debug.onStep((session, state) => {
       this.session = session;
       this.state = state;
@@ -49,11 +54,27 @@ export class GalaxyPanel {
 
   private show(galaxy: boolean): void {
     this.open = galaxy;
-    this.el.code.hidden = galaxy;
+    document.documentElement.dataset.view = galaxy ? "galaxy" : "code";
     this.el.galaxy.hidden = !galaxy;
     this.el.codeTab.setAttribute("aria-selected", String(!galaxy));
     this.el.galaxyTab.setAttribute("aria-selected", String(galaxy));
-    if (galaxy) void this.sync();
+    if (galaxy) {
+      this.refocus();
+      void this.sync();
+    }
+  }
+
+  /** The open part of the page: left of the panels, below the explainer. */
+  private refocus(): void {
+    if (!this.view || !this.open) return;
+    const side = this.el.side.getBoundingClientRect();
+    const top = this.el.explain.getBoundingClientRect().bottom;
+    const narrow = side.left < innerWidth * 0.3; // stacked (small screens): use it all
+    this.view.setFocus(
+      narrow
+        ? { x: 0, y: top, width: innerWidth, height: innerHeight - top }
+        : { x: 0, y: top, width: side.left, height: innerHeight - top },
+    );
   }
 
   private async sync(): Promise<void> {
@@ -89,11 +110,13 @@ export class GalaxyPanel {
       this.stage.replaceChildren();
       try {
         this.view = new mod.GalaxyView(this.stage, this.tree, (step) => this.debug.seek(step));
-      } catch {
+      } catch (e) {
+        console.error(e);
         this.notice("Your browser can't draw 3D here (WebGL is off or unavailable), so the galaxy can't show.");
         return;
       }
       this.describe(this.tree);
+      this.refocus();
     }
     const current = this.state;
     if (this.view && current) {
@@ -124,7 +147,7 @@ export class GalaxyPanel {
       tree.hiddenTotal > 0 ? ` To keep it readable, ${count(tree.hiddenTotal)} later ones are folded into their callers.` : "";
     const lines = [
       `Each bubble is a function call (${count(calls)} in this run), with the calls it made around it. Bigger ones ran more steps.${folded}`,
-      "Yellow is running now, faded ones have finished, and the moons are variables. Drag to look around, scroll to zoom, click a bubble to jump there.",
+      "Gold is running now, faded ones have finished, and the moons are variables. Drag to look around, scroll to zoom, click a bubble to jump there.",
     ];
     this.legend.replaceChildren(
       ...lines.map((text) => {
