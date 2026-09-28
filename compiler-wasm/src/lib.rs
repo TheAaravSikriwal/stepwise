@@ -68,7 +68,7 @@ pub fn compile(source: &str) -> CompileResult {
         "diagnostics": diagnostics,
         "debug": {
             "functions": debug.functions.iter().map(|f| json!({
-                "name": f.name, "span": map.span(f.span),
+                "name": f.name, "span": map.span(f.span), "returns": f.returns,
             })).collect::<Vec<_>>(),
             "vars": debug.vars.iter().map(|v| json!({
                 "name": v.name, "ty": v.ty, "fnId": v.fn_id, "scopeId": v.scope_id,

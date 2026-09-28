@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildCallTree, eventsThroughStep, layout, phasesAt } from "../src/galaxy/model";
+import { buildCallTree, callDetails, eventsThroughStep, layout, phasesAt } from "../src/galaxy/model";
 import { call, longLoop, recursion, straightLine } from "./fixtures/traces";
 
 // recursion fixture: main → fact(3) → fact(2) → fact(1), steps 0..8 (8 = finished).
@@ -61,5 +61,39 @@ describe("the 3D layout", () => {
 
   it("is the same every time, so bubbles never jump while scrubbing", () => {
     expect(layout(buildCallTree(recursion.trace, recursion.debug))).toEqual(pos);
+  });
+});
+
+describe("what hovering a call shows", () => {
+  // fact returns an int; main returns nothing.
+  const debug = {
+    ...recursion.debug,
+    functions: recursion.debug.functions.map((f, i) => ({ ...f, returns: i === 0 ? ("int" as const) : null })),
+  };
+  const tree = buildCallTree(recursion.trace, debug);
+  const [main, fact3, , fact1] = tree.nodes;
+  const end = recursion.trace.length;
+
+  it("gives the steps it covered, the values passed in, and what it returned", () => {
+    expect(callDetails(recursion.trace, debug, fact3, end)).toEqual({
+      firstStep: 1,
+      lastStep: 6,
+      vars: [{ varId: 0, name: "n", display: "3", shownFrom: 1, passedIn: true }],
+      returned: "6",
+    });
+    expect(callDetails(recursion.trace, debug, fact1, end).returned).toBe("1");
+  });
+
+  it("shows its own variables, not those of the calls it made, typed", () => {
+    const d = callDetails(recursion.trace, debug, main, end);
+    expect(d.vars).toEqual([{ varId: 1, name: "ok", display: "true", shownFrom: 7, passedIn: false }]);
+    expect(d.returned).toBeNull(); // main gives nothing back
+  });
+
+  it("only knows what has happened by the step you're on", () => {
+    const d = callDetails(recursion.trace, debug, fact3, eventsThroughStep(recursion.trace, 2));
+    expect(d.lastStep).toBe(2);
+    expect(d.returned).toBeNull();
+    expect(callDetails(recursion.trace, debug, main, eventsThroughStep(recursion.trace, 2)).vars).toEqual([]);
   });
 });

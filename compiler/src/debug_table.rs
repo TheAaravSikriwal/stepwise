@@ -25,6 +25,8 @@ pub struct FunctionInfo {
     pub name: String,
     /// The function's name in its declaration.
     pub span: Span,
+    /// What it gives back, for showing its return value; `None` if nothing.
+    pub returns: Option<TypeName>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]

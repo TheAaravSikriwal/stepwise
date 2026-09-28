@@ -1,4 +1,4 @@
-# Status
+﻿# Status
 
 _Last updated: 2026-09-27_
 
@@ -7,7 +7,7 @@ _Last updated: 2026-09-27_
 **Stepwise works end to end.** Write a program, press Run, and step through it forwards and
 backwards, with a plain-English explanation of every step.
 
-- **Compiler** (Rust → WebAssembly): lexer, parser, checker and codegen with trace instrumentation.
+- **Compiler** (Rust â†’ WebAssembly): lexer, parser, checker and codegen with trace instrumentation.
   Friendly error messages before anything runs (15 of them are snapshot-tested).
 - **Runtime:** runs in a Web Worker, with a limit on runaway programs and plain-English runtime
   errors (division by zero, recursion that never stops).
@@ -19,11 +19,11 @@ backwards, with a plain-English explanation of every step.
   share links, and the language and "How it works" pages.
 
 **Tests:** everything is required in CI.
-- Rust (`cargo test --workspace`): lexer 29, parser 47, checker 58, error messages 15, codegen
+- Rust (`cargo test --workspace`): lexer 29, parser 47, checker 59, error messages 15, codegen
   (7 exact traces and 23 golden programs, including the "tour" program), the 10 gallery examples,
   and trace-consistency checks on every run.
-- Web (`npm test` in `web/`): 90 tests, including the replay engine (18 correctness, 4 speed, 5
-  "where from?"), the call galaxy's tree and layout (8), the explainer, step navigation, the
+- Web (`npm test` in `web/`): 93 tests, including the replay engine (18 correctness, 4 speed, 5
+  "where from?"), the call galaxy's tree, layout and hover details (11), the explainer, step navigation, the
   highlighter, share links, and all 23 golden programs again in the browser runtime.
 
 **Checked by hand in the browser** (2026-09-27): all 10 gallery examples run and step both ways;
@@ -32,7 +32,7 @@ one of those steps (which found and fixed two bugs); step over, step out and sto
 typos, division by zero, endless loops and endless recursion all stop cleanly with clear messages.
 
 **v0.2 checked in the browser** (2026-09-27): dark, light and the ~960px frame. "Where from?" on
-the tour (`total` → line 93; recursive `n` → "called factorial and passed in n = 3"). The galaxy on
+the tour (`total` â†’ line 93; recursive `n` â†’ "called factorial and passed in n = 3"). The galaxy on
 factorial, fibonacci and fib(16) (3,194 calls, 1,194 folded, 4 ms per step): the layout, labels,
 hover, click-to-jump and theme switching.
 
@@ -57,7 +57,7 @@ To release:
    preview URL, and you test there: that's the real production setup.
 5. **Merge to `main`** when you're happy. That publishes it.
 
-For later updates, repeat steps 2–5.
+For later updates, repeat steps 2â€“5.
 
 ## Open questions
 

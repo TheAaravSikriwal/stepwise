@@ -11,8 +11,10 @@ public launch.
   function call is a bubble, each function in its own clear colour (sapphire, emerald, ruby,
   amethyst, teal and more) (bigger means more steps ran in it), the calls it made sit around it,
   and recursion curls into a chain. The call running now glows gold, finished calls fade, and
-  the running calls' variables orbit as moons. Drag to look around, scroll to zoom, hover for
-  details, click a bubble to jump there. It follows every step. Past 2,000 calls, later ones fold
+  the running calls' variables orbit as moons. Drag to look around and scroll to zoom. Hover a bubble to see
+  that call: its arguments (`fib(n = 2)`), the steps it covered, what it gave back, and each of its
+  variables with its value and the step it got it. Hover a moon for that one variable. Click
+  either to jump there. It follows every step. Past 2,000 calls, later ones fold
   into their callers. three.js loads only when the view first opens.
 - **"Where from?"** on every variable: jumps to the step that gave it its value, outlines that line,
   and says so ("Line 9 called `factorial` and passed in `n` = 3"). Exact under recursion.

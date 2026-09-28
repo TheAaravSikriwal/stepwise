@@ -919,8 +919,7 @@ main {
   position: absolute;
   z-index: 2;
   pointer-events: none;
-  max-width: 19rem;
-  padding: 0.45rem 0.8rem;
+  max-width: 22rem;
   border-radius: var(--radius-sm);
   background: var(--pop);
   backdrop-filter: blur(16px);
@@ -928,6 +927,71 @@ main {
   box-shadow: var(--shadow-pop);
   font-size: 0.82rem;
   line-height: 1.45;
+}
+
+.galaxy-tooltip {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 13rem;
+  padding: 0.7rem 0.9rem 0.65rem;
+}
+
+.galaxy-tooltip[hidden] {
+  display: none;
+}
+
+.tt-kicker {
+  font-size: 0.64rem;
+  font-weight: 650;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.tt-title {
+  font-family: var(--mono);
+  font-size: 0.98rem;
+  font-weight: 650;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.tt-meta {
+  color: var(--muted);
+}
+
+.galaxy-tooltip table {
+  margin: 0.25rem 0 0.1rem;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.galaxy-tooltip th {
+  padding: 0 0.9rem 0.2rem 0;
+  font-family: var(--ui);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--faint);
+}
+
+.galaxy-tooltip td {
+  padding: 0.12rem 0.9rem 0.12rem 0;
+  color: var(--muted);
+}
+
+.galaxy-tooltip td:nth-child(2) {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.tt-hint {
+  margin-top: 0.2rem;
+  font-size: 0.76rem;
+  color: var(--gold);
 }
 
 /* The key, floating at the bottom left over the map. */

@@ -1,8 +1,9 @@
 // The call galaxy: the run as a 3D map. Every function call is a bubble,
 // the calls it made cluster around it, and the variables of each running
 // call orbit it as small moons. Bigger means more steps ran there. The call
-// running now glows gold. Drag to look around, scroll to zoom, click a
-// bubble to jump to that moment.
+// running now glows gold. Drag to look around, scroll to zoom. Hover a
+// bubble for that call's steps and values, or a moon for that variable;
+// click either to jump to that moment.
 //
 // Loaded only when the galaxy is opened (it pulls in three.js). The layout
 // comes from model.ts and never changes while scrubbing: `update` only
@@ -13,7 +14,26 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { CSS2DObject, CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import { currentTheme } from "../embed";
 import { type FrameView, varKey } from "../replay/types";
-import { type CallTree, type Phase, type Vec3, layout, phasesAt, radiusOf } from "./model";
+import {
+  type CallDetails,
+  type CallNode,
+  type CallTree,
+  type Phase,
+  type Vec3,
+  layout,
+  phasesAt,
+  radiusOf,
+} from "./model";
+
+export interface GalaxyHooks {
+  /** Move the debugger to this step (0-based). */
+  onPick: (step: number) => void;
+  /** What a call has done so far, for its tooltip. */
+  details: (node: CallNode, eventsThrough: number) => CallDetails;
+}
+
+/** What the pointer is over: a call's bubble, or one of its variables' moons. */
+type Target = { node: number; varId: number | null };
 
 /**
  * One colour per function, cycled, so each function is easy to tell apart:
@@ -46,12 +66,18 @@ export class GalaxyView {
   private baseColours: THREE.Color[];
   private phases: Phase[] = [];
   private current = -1;
-  /** The running calls' variables, for the moons: node index → values. */
-  private orbits: { node: number; vars: { label: string; changed: boolean }[] }[] = [];
+  /** The running calls' variables, for the moons. */
+  private orbits: { node: number; vars: { varId: number; changed: boolean }[] }[] = [];
+  /** Which variable each moon instance is, as drawn this frame. */
+  private moonOwners: { node: number; varId: number }[] = [];
   private labelObjects: CSS2DObject[] = [];
   private raycaster = new THREE.Raycaster();
   private pointer = new THREE.Vector2(-9, -9);
-  private hovered = -1;
+  private hovered: Target | null = null;
+  /** The tooltip's contents are rebuilt only when this changes. */
+  private tooltipKey = "";
+  private pointerPx = { x: 0, y: 0 };
+  private detailsCache: { key: string; details: CallDetails } | null = null;
   private frame = 0;
   private resizeObserver: ResizeObserver;
   private disposed = false;
@@ -68,7 +94,7 @@ export class GalaxyView {
   constructor(
     private readonly container: HTMLElement,
     private readonly tree: CallTree,
-    private readonly onPick: (step: number) => void,
+    private readonly hooks: GalaxyHooks,
   ) {
     // Custom properties made with light-dark() read back unresolved, so
     // colours are read off an element that uses them.
@@ -187,7 +213,7 @@ export class GalaxyView {
       return [
         {
           node,
-          vars: f.vars.map((v) => ({ label: `${v.name} = ${v.display}`, changed: changed.has(varKey(frameIndex, v.varId)) })),
+          vars: f.vars.map((v) => ({ varId: v.varId, changed: changed.has(varKey(frameIndex, v.varId)) })),
         },
       ];
     });
@@ -206,6 +232,9 @@ export class GalaxyView {
     });
     this.bubbles.instanceMatrix.needsUpdate = true;
     if (this.bubbles.instanceColor) this.bubbles.instanceColor.needsUpdate = true;
+    // three.js caches the bounds it hit-tests against; bubbles appear as the
+    // run goes on, so the old bounds would miss them.
+    this.bubbles.computeBoundingSphere();
 
     const colours = this.links.geometry.getAttribute("color") as THREE.BufferAttribute;
     let k = 0;
@@ -293,15 +322,16 @@ export class GalaxyView {
     el.addEventListener("pointermove", (e) => {
       const rect = el.getBoundingClientRect();
       this.pointer.set(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
-      this.tooltip.style.left = `${e.clientX - rect.left + 14}px`;
-      this.tooltip.style.top = `${e.clientY - rect.top + 14}px`;
+      this.pointerPx = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      this.placeTooltip();
     });
     el.addEventListener("pointerleave", () => this.pointer.set(-9, -9));
     el.addEventListener("pointerdown", (e) => (down = { x: e.clientX, y: e.clientY }));
     el.addEventListener("pointerup", (e) => {
-      // A click, not the end of a drag: jump to that call.
-      if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 5 && this.hovered >= 0) {
-        this.onPick(this.tree.nodes[this.hovered].firstStep);
+      // A click, not the end of a drag: jump to that call, or to where that variable got its value.
+      if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 5 && this.hovered) {
+        const step = this.stepFor(this.hovered);
+        if (step !== null) this.hooks.onPick(step);
       }
       down = null;
     });
@@ -309,20 +339,117 @@ export class GalaxyView {
 
   private pick(): void {
     this.raycaster.setFromCamera(this.pointer, this.camera);
-    const hit = this.raycaster.intersectObject(this.bubbles)[0];
-    const i = hit?.instanceId ?? -1;
-    const visible = i >= 0 && this.phases[i] !== "waiting";
-    this.hovered = visible ? i : -1;
-    this.labels.domElement.style.cursor = visible ? "pointer" : "grab";
-    if (!visible) {
+    let target: Target | null = null;
+    for (const hit of this.raycaster.intersectObjects([this.moons, this.bubbles], false)) {
+      const id = hit.instanceId ?? -1;
+      if (hit.object === this.moons && this.moonOwners[id]) {
+        target = { ...this.moonOwners[id] };
+        break;
+      }
+      if (hit.object === this.bubbles && id >= 0 && this.phases[id] !== "waiting") {
+        target = { node: id, varId: null };
+        break;
+      }
+    }
+    this.hovered = target;
+    this.labels.domElement.style.cursor = target ? "pointer" : "grab";
+    if (!target) {
       this.tooltip.hidden = true;
+      this.tooltipKey = "";
       return;
     }
-    const n = this.tree.nodes[i];
-    const phase = i === this.current ? "running now" : this.phases[i] === "running" ? "waiting for a call it made" : "finished";
-    const folded = n.hidden ? ` · ${n.hidden} more calls folded in` : "";
-    this.tooltip.textContent = `${n.name} · ${phase} · ${n.ownSteps} ${n.ownSteps === 1 ? "step" : "steps"}${folded} · click to jump here`;
+    const key = `${target.node}:${target.varId}:${this.last?.[0] ?? 0}`;
+    if (key !== this.tooltipKey) {
+      this.tooltipKey = key;
+      this.tooltip.replaceChildren(...this.describe(target));
+    }
     this.tooltip.hidden = false;
+    this.placeTooltip();
+  }
+
+  /** A call's details as of now, worked out once per call and step. */
+  private detailsOf(node: number): CallDetails {
+    const eventsThrough = this.last?.[0] ?? 0;
+    const key = `${node}:${eventsThrough}`;
+    if (this.detailsCache?.key !== key) {
+      this.detailsCache = { key, details: this.hooks.details(this.tree.nodes[node], eventsThrough) };
+    }
+    return this.detailsCache.details;
+  }
+
+  /** Where clicking goes: a call's first step, or the step a variable got its value. */
+  private stepFor(target: Target): number | null {
+    if (target.varId === null) return this.tree.nodes[target.node].firstStep;
+    return this.detailsOf(target.node).vars.find((v) => v.varId === target.varId)?.shownFrom ?? null;
+  }
+
+  /** The tooltip: which call or variable, its steps, and its values. */
+  private describe(target: Target): Node[] {
+    const node = this.tree.nodes[target.node];
+    const d = this.detailsOf(target.node);
+    const num = (n: number) => (n + 1).toLocaleString("en-US");
+    const passed = d.vars.filter((v) => v.passedIn).map((v) => `${v.name} = ${v.display}`);
+    const call = `${node.name}(${passed.join(", ")})`;
+
+    if (target.varId !== null) {
+      const v = d.vars.find((x) => x.varId === target.varId);
+      if (!v) return [line("tt-title", "A variable")];
+      return [
+        line("tt-kicker", "Variable"),
+        line("tt-title", `${v.name} = ${v.display}`),
+        line("tt-meta", `In ${call}. ${v.passedIn ? "Passed in" : "Has had this value"} since step ${num(v.shownFrom)}.`),
+        line("tt-hint", `Click to jump to step ${num(v.shownFrom)}`),
+      ];
+    }
+
+    const phase =
+      target.node === this.current
+        ? "running now"
+        : this.phases[target.node] === "running"
+          ? "waiting for a call it made"
+          : "finished";
+    const steps =
+      d.firstStep === d.lastStep ? `Step ${num(d.firstStep)}` : `Steps ${num(d.firstStep)}–${num(d.lastStep)}`;
+    const out: Node[] = [
+      line("tt-kicker", "Function call"),
+      line("tt-title", call),
+      line("tt-meta", `${steps} · ${phase}${d.returned !== null ? ` · gave back ${d.returned}` : ""}`),
+    ];
+    if (d.vars.length) {
+      const table = document.createElement("table");
+      const head = table.createTHead().insertRow();
+      for (const h of ["Variable", "Value", "Since step"]) {
+        const th = document.createElement("th");
+        th.textContent = h;
+        head.append(th);
+      }
+      const body = table.createTBody();
+      for (const v of d.vars.slice(0, 8)) {
+        const row = body.insertRow();
+        row.insertCell().textContent = v.name;
+        row.insertCell().textContent = v.display;
+        row.insertCell().textContent = num(v.shownFrom);
+      }
+      out.push(table);
+      if (d.vars.length > 8) out.push(line("tt-meta", `and ${d.vars.length - 8} more`));
+    } else {
+      out.push(line("tt-meta", "No variables yet."));
+    }
+    if (node.hidden) out.push(line("tt-meta", `${node.hidden.toLocaleString("en-US")} more calls it made are folded in.`));
+    out.push(line("tt-hint", `Click to jump to step ${num(node.firstStep)}`));
+    return out;
+  }
+
+  /** Beside the pointer, flipped to stay on screen. */
+  private placeTooltip(): void {
+    if (this.tooltip.hidden) return;
+    const { x, y } = this.pointerPx;
+    const w = this.tooltip.offsetWidth;
+    const h = this.tooltip.offsetHeight;
+    const left = x + 16 + w > this.container.clientWidth ? x - 16 - w : x + 16;
+    const top = y + 16 + h > this.container.clientHeight ? y - 16 - h : y + 16;
+    this.tooltip.style.left = `${Math.max(8, left)}px`;
+    this.tooltip.style.top = `${Math.max(8, top)}px`;
   }
 
   private animate = (): void => {
@@ -344,6 +471,7 @@ export class GalaxyView {
     // Moons orbit their call; just-changed variables are gold.
     const matrix = new THREE.Matrix4();
     let m = 0;
+    this.moonOwners.length = 0;
     for (const { node, vars } of this.orbits) {
       const [x, y, z] = this.positions[node];
       const orbit = radiusOf(this.tree.nodes[node]) + 0.32;
@@ -354,11 +482,13 @@ export class GalaxyView {
         matrix.makeScale(size, size, size).setPosition(x + Math.cos(a) * orbit, y + Math.sin(a * 0.7) * 0.15, z + Math.sin(a) * orbit);
         this.moons.setMatrixAt(m, matrix);
         this.moons.setColorAt(m, v.changed ? this.now : this.moonColour);
+        this.moonOwners[m] = { node, varId: v.varId };
         m++;
       });
     }
     this.moons.count = m;
     this.moons.instanceMatrix.needsUpdate = true;
+    this.moons.computeBoundingSphere(); // they move every frame
     if (this.moons.instanceColor) this.moons.instanceColor.needsUpdate = true;
 
     if (this.frame % 3 === 0) this.pick();
@@ -384,4 +514,11 @@ export class GalaxyView {
     });
     this.container.replaceChildren();
   }
+}
+
+function line(className: string, text: string): HTMLElement {
+  const div = document.createElement("div");
+  div.className = className;
+  div.textContent = text;
+  return div;
 }

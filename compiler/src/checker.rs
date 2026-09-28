@@ -130,6 +130,7 @@ impl Checker {
             self.out.debug.functions.push(FunctionInfo {
                 name: f.name.name.clone(),
                 span: f.name.span,
+                returns: ret.and_then(Type::type_name),
             });
             self.signatures.push((params, ret));
         }

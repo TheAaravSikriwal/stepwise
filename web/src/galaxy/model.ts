@@ -7,7 +7,7 @@
 // returned), and current (the innermost running one), never the layout, so
 // bubbles don't jump around as you scrub.
 
-import type { DebugTable } from "../compiler";
+import type { DebugTable, TypeName } from "../compiler";
 import { Kind, type TraceData } from "../runtime/trace";
 
 export interface CallNode {
@@ -212,4 +212,98 @@ export function layout(tree: CallTree): Vec3[] {
     });
   }
   return pos;
+}
+
+// ----------------------------------------------------------------- details
+
+export interface VarDetail {
+  varId: number;
+  name: string;
+  display: string;
+  /**
+   * The first step (0-based, as the debugger counts) that shows this value:
+   * just after the statement that set it. Jumping here shows it.
+   */
+  shownFrom: number;
+  /** Passed in by the caller (a parameter's first value). */
+  passedIn: boolean;
+}
+
+export interface CallDetails {
+  /** The steps (0-based) this call covers so far, including the calls it made. */
+  firstStep: number;
+  lastStep: number;
+  /** Each of its variables' latest values, in the order they were made. */
+  vars: VarDetail[];
+  /** What it gave back, once it has returned (null if it gives nothing back). */
+  returned: string | null;
+}
+
+function display(value: number, ty: TypeName | null | undefined): string {
+  return ty === "bool" ? String(value !== 0) : String(value);
+}
+
+/** The step containing event i: the last `line` event at or before it (-1 before the first). */
+function stepOfEvent(trace: TraceData, i: number): number {
+  let lo = 0;
+  let hi = trace.lines.length - 1;
+  let found = -1;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    if (trace.lines[mid] <= i) {
+      found = mid;
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  return found;
+}
+
+/**
+ * What a call did, as of `eventsThrough` events: for hovering its bubble.
+ * Scans the call's own events once (calls it made are skipped over).
+ */
+export function callDetails(trace: TraceData, debug: DebugTable, node: CallNode, eventsThrough: number): CallDetails {
+  const stop = Math.min(node.end, eventsThrough);
+  let step = stepOfEvent(trace, node.start);
+  let firstStep = -1;
+  let depth = 0;
+  let ownLine = false;
+  const vars = new Map<number, VarDetail>();
+  for (let i = node.start + 1; i < stop; i++) {
+    switch (trace.kind[i]) {
+      case Kind.Line:
+        step++;
+        if (firstStep < 0) firstStep = step;
+        if (depth === 0) ownLine = true;
+        break;
+      case Kind.Call:
+        depth++;
+        break;
+      case Kind.Ret:
+        depth--;
+        break;
+      case Kind.Declare:
+      case Kind.Assign: {
+        if (depth !== 0) break;
+        const varId = trace.a[i];
+        const info = debug.vars[varId];
+        const declare = trace.kind[i] === Kind.Declare;
+        // Map.set keeps the first insertion's order, so variables stay in the order they were made.
+        vars.set(varId, {
+          varId,
+          name: info?.name ?? `var ${varId}`,
+          display: display(declare ? trace.b[i] : trace.c[i], info?.ty),
+          shownFrom: step + 1,
+          // Declared before the call's first line: a parameter (they can't be changed after).
+          passedIn: declare && !ownLine,
+        });
+        break;
+      }
+    }
+  }
+  const returns = debug.functions[node.fnId]?.returns;
+  const returned = node.end < eventsThrough && returns ? display(trace.a[node.end], returns) : null;
+  return { firstStep: Math.max(0, firstStep < 0 ? step : firstStep), lastStep: Math.max(0, step), vars: [...vars.values()], returned };
 }

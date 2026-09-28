@@ -7,7 +7,7 @@
 import type { ReplayState } from "../replay/types";
 import type { TraceData } from "../runtime/trace";
 import type { Debugger, Session } from "../ui/debugger";
-import { type CallTree, buildCallTree, eventsThroughStep } from "./model";
+import { type CallTree, buildCallTree, callDetails, eventsThroughStep } from "./model";
 import type { GalaxyView } from "./view";
 
 interface Elements {
@@ -109,7 +109,11 @@ export class GalaxyPanel {
       if (this.viewTrace !== trace || !this.tree) return;
       this.stage.replaceChildren();
       try {
-        this.view = new mod.GalaxyView(this.stage, this.tree, (step) => this.debug.seek(step));
+        const debug = this.session.debug;
+        this.view = new mod.GalaxyView(this.stage, this.tree, {
+          onPick: (step) => this.debug.seek(step),
+          details: (node, eventsThrough) => callDetails(trace, debug, node, eventsThrough),
+        });
       } catch (e) {
         console.error(e);
         this.notice("Your browser can't draw 3D here (WebGL is off or unavailable), so the galaxy can't show.");
@@ -147,7 +151,7 @@ export class GalaxyPanel {
       tree.hiddenTotal > 0 ? ` To keep it readable, ${count(tree.hiddenTotal)} later ones are folded into their callers.` : "";
     const lines = [
       `Each bubble is a function call (${count(calls)} in this run), with the calls it made around it. Bigger ones ran more steps.${folded}`,
-      "Gold is running now, faded ones have finished, and the moons are variables. Drag to look around, scroll to zoom, click a bubble to jump there.",
+      "Gold is running now, faded ones have finished, and the moons are variables. Drag to look around, scroll to zoom, hover a bubble or moon for its steps and values, click to jump there.",
     ];
     this.legend.replaceChildren(
       ...lines.map((text) => {

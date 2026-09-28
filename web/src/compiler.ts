@@ -20,7 +20,8 @@ export interface Diagnostic {
 export type TypeName = "int" | "bool";
 
 export interface DebugTable {
-  functions: { name: string; span: Range }[];
+  /** `returns`: what the function gives back, or null for nothing (absent in hand-made tables). */
+  functions: { name: string; span: Range; returns?: TypeName | null }[];
   vars: { name: string; ty: TypeName; fnId: number; scopeId: number; span: Range }[];
   scopes: { fnId: number; parent: number | null; span: Range }[];
   /** Indexed by span_id from `line(span_id)` events. */

@@ -613,6 +613,14 @@ fn debug_parameters_live_in_the_function_body_scope() {
     assert_eq!(c.debug.vars[n].fn_id, 0);
 }
 
+#[test]
+fn debug_functions_record_what_they_give_back() {
+    let src = "fn count() -> int { return 1; }\nfn yes() -> bool { return true; }\nfn main() { }";
+    let (_, c) = ok(src);
+    let returns: Vec<_> = c.debug.functions.iter().map(|f| f.returns).collect();
+    assert_eq!(returns, [Some(TypeName::Int), Some(TypeName::Bool), None]);
+}
+
 // ================================================================ robustness
 
 #[test]
