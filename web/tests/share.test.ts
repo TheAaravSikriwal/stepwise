@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decodeProgram, encodeProgram } from "../src/share";
+import { MAX_PROGRAM_BYTES, decodeProgram, encodeProgram } from "../src/share";
 
 describe("shareable links", () => {
   it("round-trips a program", async () => {
@@ -31,5 +31,19 @@ describe("shareable links", () => {
     expect(await decodeProgram("#other=1")).toBeNull();
     expect(await decodeProgram("#code=not!valid!base64")).toBeNull();
     expect(await decodeProgram("#code=AAAA")).toBeNull();
+  });
+
+  it("refuses a link that unpacks to something huge, without unpacking it all", async () => {
+    // A few kilobytes of link that would inflate to 50 MB.
+    const bomb = await encodeProgram("a".repeat(50 * 1024 * 1024));
+    expect(bomb.length).toBeLessThan(200_000);
+    const start = performance.now();
+    expect(await decodeProgram(bomb)).toBeNull();
+    expect(performance.now() - start).toBeLessThan(1000);
+  });
+
+  it("still opens a program right up to the limit", async () => {
+    const src = "// " + "x".repeat(MAX_PROGRAM_BYTES - 3);
+    expect(await decodeProgram(await encodeProgram(src))).toBe(src);
   });
 });

@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+# CI only reads the code; its token can't push, comment or change settings.
+permissions:
+  contents: read
+
 # Every test is required: a red build means something regressed.
 jobs:
   rust:
