@@ -1,4 +1,4 @@
-﻿# Status
+# Status
 
 _Last updated: 2026-09-27_
 
