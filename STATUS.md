@@ -7,7 +7,7 @@ _Last updated: 2026-09-27_
 **Stepwise works end to end.** Write a program, press Run, and step through it forwards and
 backwards, with a plain-English explanation of every step.
 
-- **Compiler** (Rust â†’ WebAssembly): lexer, parser, checker and codegen with trace instrumentation.
+- **Compiler** (Rust → WebAssembly): lexer, parser, checker and codegen with trace instrumentation.
   Friendly error messages before anything runs (15 of them are snapshot-tested).
 - **Runtime:** runs in a Web Worker, with a limit on runaway programs and plain-English runtime
   errors (division by zero, recursion that never stops).
@@ -32,7 +32,7 @@ one of those steps (which found and fixed two bugs); step over, step out and sto
 typos, division by zero, endless loops and endless recursion all stop cleanly with clear messages.
 
 **v0.2 checked in the browser** (2026-09-27): dark, light and the ~960px frame. "Where from?" on
-the tour (`total` â†’ line 93; recursive `n` â†’ "called factorial and passed in n = 3"). The galaxy on
+the tour (`total` → line 93; recursive `n` → "called factorial and passed in n = 3"). The galaxy on
 factorial, fibonacci and fib(16) (3,194 calls, 1,194 folded, 4 ms per step): the layout, labels,
 hover, click-to-jump and theme switching.
 
@@ -60,11 +60,10 @@ To release:
    preview URL, and you test there: that's the real production setup.
 5. **Merge to `main`** when you're happy. That publishes it.
 
-For later updates, repeat steps 2â€“5.
+For later updates, repeat steps 2–5.
 
 ## Open questions
 
-- **LICENSE:** MIT, which needs the name to put on it.
 - **Social preview image:** once the final URL is live.
 
 ## Notes

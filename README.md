@@ -49,3 +49,7 @@ If builds randomly fail with `can't find crate for ...` or "An Application Contr
 blocked this file", Windows Smart App Control is blocking DLLs the Rust compiler just built. See
 STATUS.md for options. To format code without `cargo fmt`, run `rustfmt` on the files directly;
 `rustfmt.toml` sets the edition.
+
+## License
+
+[MIT](LICENSE) © 2026 Aarav Sikriwal
