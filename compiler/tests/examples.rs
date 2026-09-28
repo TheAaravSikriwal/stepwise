@@ -6,7 +6,7 @@
 
 mod harness;
 
-use stepwise_compiler::{Stage, compile_with};
+use stepwise_compiler::compile;
 
 #[test]
 fn gallery_examples_compile_and_run() {
@@ -21,7 +21,7 @@ fn gallery_examples_compile_and_run() {
         count += 1;
         let name = path.file_name().unwrap().to_string_lossy().into_owned();
         let source = std::fs::read_to_string(&path).unwrap();
-        let out = compile_with(&source, Stage::Codegen);
+        let out = compile(&source);
         if !out.diagnostics.is_empty() {
             let rendered: Vec<String> = out
                 .diagnostics

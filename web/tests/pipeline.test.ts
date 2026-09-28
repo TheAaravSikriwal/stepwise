@@ -14,8 +14,8 @@ beforeAll(() => {
   compilerModule.initSync({ module: readFileSync(wasmPath) });
 });
 
-describe("phase 0 pipeline", () => {
-  it("compiles, runs, and records the stub program", async () => {
+describe("the whole pipeline", () => {
+  it("compiles, runs, and records hello", async () => {
     const compiled = compileWith(compilerModule, "fn main() { print(42); }");
     expect(compiled.diagnostics).toEqual([]);
     expect(compiled.debug.functions.map((f) => f.name)).toEqual(["main"]);

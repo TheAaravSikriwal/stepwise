@@ -38,6 +38,14 @@ export function narrate(
     happened.push(...variableChanges(prev, cur, shared));
     for (const text of cur.output.slice(prev.output.length)) happened.push(`Printed ${text}.`);
     happened.push(...calls(cur, shared));
+    // A run that was stopped (an error, or the step limit) didn't get to
+    // decide anything: where it "went next" says nothing about a condition.
+    const stopped = cur.line === null && endMessage !== null;
+    if (stopped) {
+      const where = prev.line === null ? "" : ` on line ${lineOfStep(prev.line, ctx)}`;
+      happened.push(`The program stopped${where}: ${endMessage}`);
+      return { happened, next: null };
+    }
     const checked = condition(prev, cur, ctx);
     if (checked) happened.unshift(checked);
     if (happened.length === 0 && prev.line !== null) {

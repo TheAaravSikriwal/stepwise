@@ -140,47 +140,24 @@ export class Debugger {
     });
   }
 
-  /** Demo mode, but the editor holds something other than the demo's program. */
-  demoOnly(loadDemo: () => void): void {
+  /** Demo mode (`?demo`), but the editor holds something other than the demo's program. */
+  demoOnly(): void {
     this.stop();
     this.emptyPanels();
     this.el.output.replaceChildren(notice("Nothing ran."));
     this.explain({
       tone: "problem",
-      label: "Demo mode only knows one program",
+      label: "This is the demo page",
       lines: [
-        "This page is a demo: it can only step through its own small example, not the code in the editor.",
-        "Stepping through your own programs works once Stepwise's compiler is finished.",
+        "The demo only plays its own small example, not the code in the editor.",
+        "To run and step through your own code, use the normal playground.",
       ],
       action: {
-        label: "Show the demo program",
+        label: "Open the playground",
         run: () => {
-          loadDemo();
-          this.idle();
-        },
-      },
-    });
-  }
-
-  /** The compiler is still being built, so what ran was a placeholder. */
-  compilerUnfinished(): void {
-    this.stop();
-    this.emptyPanels();
-    this.el.output.replaceChildren(notice("Nothing to show: your program didn't really run."));
-    this.explain({
-      tone: "problem",
-      label: "Stepwise's compiler isn't finished yet",
-      lines: [
-        "It can't run your code yet, so nothing on screen would be your program's real output.",
-        "To see how stepping through a program will work, open the demo.",
-      ],
-      action: {
-        label: "Open the demo",
-        run: () => {
-          // Keep ?embed and ?theme, so the demo still fits the page it's framed in.
+          // Keep ?embed and ?theme, so it still fits a page it's framed in.
           const url = new URL(location.href);
-          url.searchParams.set("demo", "");
-          url.hash = "";
+          url.searchParams.delete("demo");
           location.assign(url);
         },
       },
@@ -275,7 +252,10 @@ export class Debugger {
     const last = s.replay.stepCount - 1;
     const atEnd = st.step === last;
 
-    this.el.stepLabel.textContent = atEnd ? `Finished · ${last} steps` : `Step ${st.step + 1} of ${last}`;
+    const count = (n: number) => n.toLocaleString("en-US");
+    this.el.stepLabel.textContent = atEnd
+      ? `${s.endMessage ? "Stopped" : "Finished"} · ${count(last)} steps`
+      : `Step ${count(st.step + 1)} of ${count(last)}`;
     this.el.timeline.value = String(st.step);
     this.el.toStart.disabled = this.el.back.disabled = this.el.prevBreak.disabled = st.step === 0;
     this.el.forward.disabled = this.el.toEnd.disabled = this.el.nextBreak.disabled = atEnd;

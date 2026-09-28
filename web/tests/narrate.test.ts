@@ -109,9 +109,17 @@ describe("narrate: calls, returns, prints and errors", () => {
     ]);
   });
 
-  it("explains a runtime error at the end", () => {
+  it("explains a runtime error at the end, with the line it stopped on", () => {
     const n = narrate(inAdd, state({ step: 2, frames: [] }), ctx, "Division by zero.");
-    expect(n.happened.at(-1)).toBe("The program stopped: Division by zero.");
+    expect(n.happened.at(-1)).toBe("The program stopped on line 2: Division by zero.");
+    expect(n.happened.some((h) => h.startsWith("Ran line"))).toBe(false);
+  });
+
+  it("doesn't read a condition's result into a run that was stopped", () => {
+    // The last step was checking a while condition when the step limit hit.
+    const cond = { ...inMain, line: 1 };
+    const n = narrate(cond, state({ step: 2, frames: [] }), ctx, "Stopped after 1,000,000 steps.");
+    expect(n.happened.some((h) => h.startsWith("Checked"))).toBe(false);
   });
 
   it("tells a new call apart from the one it replaced, at the same depth", () => {

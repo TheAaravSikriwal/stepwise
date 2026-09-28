@@ -31,8 +31,7 @@ scope.onmessage = async ({ data: req }) => {
       return;
     }
     const { trace, outcome } = await run(wasm);
-    const realCompiler = compilerModule.pipeline() === "Codegen";
-    scope.postMessage({ type: "ran", id: req.id, meta, trace, outcome, realCompiler }, transferables(trace));
+    scope.postMessage({ type: "ran", id: req.id, meta, trace, outcome }, transferables(trace));
   } catch (e) {
     const message = panicMessage
       ? `The compiler crashed. This is a bug in Stepwise, not in your program.\n\n${panicMessage}`

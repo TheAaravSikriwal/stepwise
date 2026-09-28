@@ -4,6 +4,7 @@ on:
   push:
   pull_request:
 
+# Every test is required: a red build means something regressed.
 jobs:
   rust:
     runs-on: ubuntu-latest
@@ -15,26 +16,9 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo fmt --all --check
       - run: cargo clippy --workspace --all-targets -- -D warnings
-      - run: cargo test --workspace --lib --bins
-      - run: cargo test --workspace --doc
-      - run: cargo test -p stepwise-compiler --test phase0
-      # Core pieces still being written: run and report, but don't fail CI.
-      # Move each line up (dropping continue-on-error) once its tests pass.
-      - name: "In progress: lexer"
-        run: cargo test -p stepwise-compiler --test lexer
-        continue-on-error: true
-      - name: "In progress: parser"
-        run: cargo test -p stepwise-compiler --test parser --test parser_depth
-        continue-on-error: true
-      - name: "In progress: checker"
-        run: cargo test -p stepwise-compiler --test checker
-        continue-on-error: true
-      - name: "In progress: codegen"
-        run: cargo test -p stepwise-compiler --test codegen --test examples
-        continue-on-error: true
-      - name: "In progress: error message snapshots"
-        run: cargo test -p stepwise-compiler --test error_messages
-        continue-on-error: true
+      # Lexer, parser, checker, codegen, golden programs, gallery examples,
+      # error-message snapshots, and the trace-consistency checks.
+      - run: cargo test --workspace
 
   web:
     runs-on: ubuntu-latest
@@ -56,13 +40,10 @@ jobs:
         working-directory: web
       - run: npm run wasm
         working-directory: web
-      - run: npx vitest run --exclude "tests/replay*.test.ts"
+      # Runtime, replay engine (correctness and speed), explainer, step
+      # navigation, share links, and every golden program in the browser runtime.
+      - run: npm test
         working-directory: web
-      # Core piece still being written: report, but don't fail CI.
-      - name: "In progress: replay engine"
-        run: npx vitest run tests/replay
-        working-directory: web
-        continue-on-error: true
       - run: npm run build
         working-directory: web
       - uses: actions/upload-artifact@v4

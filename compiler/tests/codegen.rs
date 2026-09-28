@@ -6,7 +6,7 @@
 mod harness;
 
 use harness::Event::{self, *};
-use stepwise_compiler::{DebugTable, Stage, checker, codegen, compile_with, parser};
+use stepwise_compiler::{DebugTable, checker, codegen, compile, parser};
 
 /// Parses, checks and compiles `src`, which must have no errors.
 fn build(src: &str) -> (Vec<u8>, DebugTable) {
@@ -277,7 +277,7 @@ fn steps_highlight_statements_and_conditions() {
 #[test]
 fn full_pipeline_fills_the_debug_table() {
     let src = include_str!("../../docs/examples/factorial.step");
-    let out = compile_with(src, Stage::Codegen);
+    let out = compile(src);
     assert!(out.diagnostics.is_empty());
     assert!(out.wasm.is_some());
     assert_eq!(out.debug.steps.len(), 9);

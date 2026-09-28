@@ -10,14 +10,14 @@
 //!
 //! Read every snapshot as a beginner would: is it clear what's wrong and how to fix it?
 
-use stepwise_compiler::{Stage, compile_with};
+use stepwise_compiler::compile;
 
 #[test]
 fn error_messages() {
     insta::glob!("errors/*.step", |path| {
         let source = std::fs::read_to_string(path).unwrap().replace("\r\n", "\n");
         let name = path.file_name().unwrap().to_string_lossy().into_owned();
-        let out = compile_with(&source, Stage::Codegen);
+        let out = compile(&source);
         assert!(
             out.has_errors(),
             "{name} is in tests/errors/ but compiled without errors"

@@ -51,13 +51,6 @@ pub fn test_panic() {
     panic!("test panic requested");
 }
 
-/// Which compiler stages are real (see `PIPELINE` in the compiler crate),
-/// e.g. `"Stub"` or `"Codegen"`.
-#[wasm_bindgen]
-pub fn pipeline() -> String {
-    format!("{:?}", stepwise_compiler::PIPELINE)
-}
-
 #[wasm_bindgen]
 pub fn compile(source: &str) -> CompileResult {
     let source = normalize_newlines(source);

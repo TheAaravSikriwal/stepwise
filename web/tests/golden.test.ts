@@ -1,7 +1,6 @@
 // Runs every golden program (compiler/tests/programs) through the *browser*
 // runtime, not wasmtime, so the JS host functions are checked against the
-// same expectations as the Rust tests. Skipped until the real compiler
-// exists (PIPELINE = Codegen).
+// same expectations as the Rust tests.
 
 import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -13,7 +12,6 @@ import { outputOf } from "../src/runtime/trace";
 
 const wasmPath = fileURLToPath(new URL("../pkg/stepwise_wasm_bg.wasm", import.meta.url));
 compilerModule.initSync({ module: readFileSync(wasmPath) });
-const realCompiler = compilerModule.pipeline() === "Codegen";
 
 const dir = fileURLToPath(new URL("../../compiler/tests/programs/", import.meta.url));
 const programs = readdirSync(dir)
@@ -40,7 +38,7 @@ beforeAll(() => {
   expect(programs.length).toBeGreaterThanOrEqual(20);
 });
 
-describe.skipIf(!realCompiler)("golden programs in the browser runtime", () => {
+describe("golden programs in the browser runtime", () => {
   for (const p of programs) {
     it(p.name, async () => {
       const compiled = compileWith(compilerModule, p.source);

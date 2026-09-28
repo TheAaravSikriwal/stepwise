@@ -9,11 +9,7 @@ export type Request = { type: "run"; id: number; source: string };
 export type Response =
   /** Compilation failed; `meta.diagnostics` has at least one error. */
   | { type: "compile-error"; id: number; meta: CompileMeta }
-  /**
-   * Compiled and ran. The trace's buffers are transferred, not copied.
-   * `realCompiler` is false while the compiler is unfinished (PIPELINE is
-   * below Codegen): the program that ran was a placeholder, not the user's.
-   */
-  | { type: "ran"; id: number; meta: CompileMeta; trace: TraceData; outcome: Outcome; realCompiler: boolean }
+  /** Compiled and ran. The trace's buffers are transferred, not copied. */
+  | { type: "ran"; id: number; meta: CompileMeta; trace: TraceData; outcome: Outcome }
   /** Something went wrong inside Stepwise itself. */
   | { type: "internal-error"; id: number; message: string };
