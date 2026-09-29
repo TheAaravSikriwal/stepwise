@@ -16,7 +16,8 @@ interface Elements {
   galaxy: HTMLElement;
   /** The panels over the map, so the map can centre in the space left over. */
   side: HTMLElement;
-  explain: HTMLElement;
+  /** Run and the stepper, which stay over the map and head its open space. */
+  toolbar: HTMLElement;
 }
 
 export class GalaxyPanel {
@@ -45,7 +46,9 @@ export class GalaxyPanel {
     el.galaxyTab.addEventListener("click", () => this.show(true));
     addEventListener("resize", () => this.refocus());
     // On a phone the panels' tray grows as the run fills it, which moves the gap.
-    new ResizeObserver(() => this.refocus()).observe(el.side);
+    const moved = new ResizeObserver(() => this.refocus());
+    moved.observe(el.side);
+    moved.observe(el.toolbar);
     debug.onStep((session, state) => {
       this.session = session;
       this.state = state;
@@ -66,12 +69,13 @@ export class GalaxyPanel {
     }
   }
 
-  /** The open part of the page: below the explainer, and left of the panels
-   * on a wide screen or above their tray on a phone (style.css). */
+  /** The open part of the page: below Run and the stepper, and left of the
+   * panels on a wide screen or above their tray on a phone (style.css). The
+   * explainer heads the side column, so on a phone it is in the tray. */
   private refocus(): void {
     if (!this.view || !this.open) return;
     const side = this.el.side.getBoundingClientRect();
-    const top = this.el.explain.getBoundingClientRect().bottom;
+    const top = this.el.toolbar.getBoundingClientRect().bottom;
     const narrow = side.left < innerWidth * 0.3; // stacked (small screens)
     this.view.setFocus(
       narrow

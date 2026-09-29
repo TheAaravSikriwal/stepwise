@@ -59,7 +59,7 @@ const galaxy = new GalaxyPanel(
     galaxyTab: $<HTMLButtonElement>("#tab-galaxy"),
     galaxy: $("#galaxy"),
     side: $(".side"),
-    explain: $("#explain"),
+    toolbar: $(".toolbar"),
   },
   debug,
 );

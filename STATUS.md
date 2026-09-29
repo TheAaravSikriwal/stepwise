@@ -39,7 +39,7 @@ hover, click-to-jump and theme switching.
 ## Releasing on wearechintu.com
 
 **Live since 2026-09-28** at https://wearechintu.com/stepwise (first published as Stepwise
-51b5e06 in site commit f01f55b; now Stepwise e143459, site commit cb6021d, live 2026-09-29 with the call galaxy on a phone). The portfolio line reads "Stepwise: a language that runs backward".
+51b5e06 in site commit f01f55b; now Stepwise e143459, site commit cb6021d, live 2026-09-29 with the call galaxy on a phone. That build predates the two-column layout, e5f8f70, which the site does not run yet). The portfolio line reads "Stepwise: a language that runs backward".
 
 Stepwise ships as part of the site, the way the site itself is released (Vercel: every pushed
 branch gets a preview, and merging to `main` publishes). **Nothing is published until you've tested

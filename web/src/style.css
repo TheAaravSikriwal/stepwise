@@ -1267,10 +1267,10 @@ html[data-view="galaxy"] .explain::before {
   /* The galaxy on a phone. On a wide screen it shows beside the panels; here
    * the panels are stacked full width and covered it completely, so the
    * galaxy view was a screenful of frosted panels and no galaxy. Instead the
-   * page becomes exactly one screen: the controls and the explainer at the
-   * top, the panels in a short tray at the bottom that scrolls inside
-   * itself, and the galaxy in the open space between them (panel.ts aims the
-   * camera at that gap). */
+   * page becomes exactly one screen: Run and the stepper at the top, the side
+   * column (the explainer, the two views and the panels) in a short tray at
+   * the bottom that scrolls inside itself, and the galaxy in the open space
+   * between them (panel.ts aims the camera at that gap). */
   html[data-view="galaxy"] body {
     height: 100svh;
     min-height: 0;
@@ -1280,11 +1280,12 @@ html[data-view="galaxy"] .explain::before {
   html[data-view="galaxy"] main {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: space-between;
   }
 
+  /* Of the code column only Run and the stepper stay (below), at the top. */
   html[data-view="galaxy"] .code-view {
-    display: none;
+    flex: none;
   }
 
   html[data-view="galaxy"] .side {
