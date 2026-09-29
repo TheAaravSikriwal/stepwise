@@ -44,6 +44,8 @@ export class GalaxyPanel {
     el.codeTab.addEventListener("click", () => this.show(false));
     el.galaxyTab.addEventListener("click", () => this.show(true));
     addEventListener("resize", () => this.refocus());
+    // On a phone the panels' tray grows as the run fills it, which moves the gap.
+    new ResizeObserver(() => this.refocus()).observe(el.side);
     debug.onStep((session, state) => {
       this.session = session;
       this.state = state;
@@ -64,15 +66,16 @@ export class GalaxyPanel {
     }
   }
 
-  /** The open part of the page: left of the panels, below the explainer. */
+  /** The open part of the page: below the explainer, and left of the panels
+   * on a wide screen or above their tray on a phone (style.css). */
   private refocus(): void {
     if (!this.view || !this.open) return;
     const side = this.el.side.getBoundingClientRect();
     const top = this.el.explain.getBoundingClientRect().bottom;
-    const narrow = side.left < innerWidth * 0.3; // stacked (small screens): use it all
+    const narrow = side.left < innerWidth * 0.3; // stacked (small screens)
     this.view.setFocus(
       narrow
-        ? { x: 0, y: top, width: innerWidth, height: innerHeight - top }
+        ? { x: 0, y: top, width: innerWidth, height: Math.max(80, side.top - top) }
         : { x: 0, y: top, width: side.left, height: innerHeight - top },
     );
   }

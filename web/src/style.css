@@ -364,7 +364,15 @@ button.quiet:hover:not(:disabled) {
 }
 
 .code-head #share {
+  flex: none;
   margin-left: auto;
+}
+
+/* The examples menu gives way before Share does: on a phone its widest
+ * example name pushed Share off the edge of the screen. */
+.code-head #examples {
+  min-width: 0;
+  flex: 0 1 auto;
 }
 
 .code-head .share-status {
@@ -1248,16 +1256,54 @@ html[data-view="galaxy"] .explain::before {
     max-width: none;
   }
 
-  html[data-view="galaxy"] .code-view {
-    display: none;
-  }
-
   html[data-view="galaxy"] .explain {
     max-width: none;
   }
 
   .galaxy-legend {
     display: none;
+  }
+
+  /* The galaxy on a phone. On a wide screen it shows beside the panels; here
+   * the panels are stacked full width and covered it completely, so the
+   * galaxy view was a screenful of frosted panels and no galaxy. Instead the
+   * page becomes exactly one screen: the controls and the explainer at the
+   * top, the panels in a short tray at the bottom that scrolls inside
+   * itself, and the galaxy in the open space between them (panel.ts aims the
+   * camera at that gap). */
+  html[data-view="galaxy"] body {
+    height: 100svh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  html[data-view="galaxy"] main {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  html[data-view="galaxy"] .code-view {
+    display: none;
+  }
+
+  html[data-view="galaxy"] .side {
+    display: flex;
+    flex-direction: column;
+    max-height: 38%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: var(--radius);
+  }
+
+  html[data-view="galaxy"] .side .panel {
+    flex: none;
+    overflow: visible;
+  }
+
+  html[data-view="galaxy"] .vars,
+  html[data-view="galaxy"] .output {
+    min-height: 0;
   }
 }
 
