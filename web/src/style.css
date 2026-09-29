@@ -1297,8 +1297,13 @@ html[data-view="galaxy"] .explain::before {
     border-radius: var(--radius);
   }
 
-  html[data-view="galaxy"] .side .panel {
+  /* Nothing in the tray shrinks: it scrolls instead. Shrunk to fit, the
+   * explainer ran its text under the two views below it. */
+  html[data-view="galaxy"] .side > * {
     flex: none;
+  }
+
+  html[data-view="galaxy"] .side .panel {
     overflow: visible;
   }
 
